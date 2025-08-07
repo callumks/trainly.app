@@ -1,0 +1,41 @@
+# Environment Variables for Trainly App
+
+# ============================================
+# REQUIRED - Core App Functionality
+# ============================================
+
+# Database Configuration (Railway PostgreSQL)
+DATABASE_URL=postgresql://username:password@host:port/database
+
+# JWT Secret for Authentication (CHANGE THIS!)
+JWT_SECRET=your-super-secret-jwt-key-change-this-to-something-very-secure-and-random
+
+# OpenAI API Key for AI Training Plan Generation
+OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# ============================================
+# STRAVA INTEGRATION
+# ============================================
+
+# Strava OAuth Configuration
+NEXT_PUBLIC_STRAVA_CLIENT_ID=your-strava-client-id
+STRAVA_CLIENT_SECRET=your-strava-client-secret
+
+# ============================================
+# GOOGLE INTEGRATIONS (Optional but recommended)
+# ============================================
+
+# Google OAuth for Calendar/Sheets
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# ============================================
+# OPTIONAL - Additional Features
+# ============================================
+
+# Stripe for Payments (if you want monetization)
+STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
+
+# App Configuration
+NODE_ENV=production

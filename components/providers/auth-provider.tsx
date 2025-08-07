@@ -1,43 +1,44 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { User, Session } from '@supabase/supabase-js'
-import { useSupabase } from './supabase-provider'
+
+type User = {
+  id: string
+  email: string
+}
 
 type AuthContext = {
   user: User | null
-  session: Session | null
+  session: any | null
   loading: boolean
 }
 
 const Context = createContext<AuthContext | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { supabase } = useSupabase()
   const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
+  const [session, setSession] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }
-
-    getSession()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
+    // Check for existing session on load
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me')
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData.user)
+          setSession({ user: userData.user })
+        }
+      } catch (error) {
+        console.log('No existing session')
+      } finally {
         setLoading(false)
       }
-    )
+    }
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+    checkAuth()
+  }, [])
 
   return (
     <Context.Provider value={{ user, session, loading }}>
