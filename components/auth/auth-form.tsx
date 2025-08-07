@@ -41,22 +41,24 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
   const onEmailSubmit = async (data: AuthFormData) => {
     setIsLoading(true)
     try {
+      const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login'
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Authentication failed')
+      }
+
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        })
-        if (error) throw error
-        toast.success('Check your email to confirm your account!')
+        toast.success('Account created successfully! Please sign in.')
+        // You might want to redirect to login or auto-sign them in
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        })
-        if (error) throw error
+        toast.success('Welcome back!')
         router.push('/dashboard')
       }
     } catch (error: any) {
@@ -69,14 +71,10 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
   const handleStravaAuth = async () => {
     setIsStravaLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'strava',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: 'read,activity:read_all',
-        },
-      })
-      if (error) throw error
+      // For now, redirect to Strava OAuth manually
+      // TODO: Implement proper Strava OAuth flow
+      const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/callback')}&approval_prompt=force&scope=read,activity:read_all`
+      window.location.href = stravaAuthUrl
     } catch (error: any) {
       toast.error(error.message || 'Failed to connect with Strava')
       setIsStravaLoading(false)

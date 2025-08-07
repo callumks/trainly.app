@@ -1,18 +1,85 @@
-import { createClient } from '@supabase/supabase-js'
-import { createClientComponentClient, createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { Pool } from 'pg'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Database connection for Railway PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:tNcTUlhymzpXJBlwOOWtXNFctKXJtloG@interchange.proxy.rlwy.net:24312/railway',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+})
 
-// For client-side usage
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Export the database pool for use in API routes
+export const db = pool
 
-// For client components
-export const createClientSupabase = () => createClientComponentClient()
+// Simple database client for consistency with existing code
+export const supabase = {
+  from: (table: string) => ({
+    select: (columns: string = '*') => ({
+      eq: (column: string, value: any) => ({
+        single: async () => {
+          const query = `SELECT ${columns} FROM ${table} WHERE ${column} = $1 LIMIT 1`
+          const result = await pool.query(query, [value])
+          return { data: result.rows[0] || null, error: null }
+        },
+        async then(resolve: any) {
+          const query = `SELECT ${columns} FROM ${table} WHERE ${column} = $1`
+          const result = await pool.query(query, [value])
+          resolve({ data: result.rows, error: null })
+        }
+      }),
+      gte: (column: string, value: any) => ({
+        lte: (column2: string, value2: any) => ({
+          order: (orderColumn: string, options?: { ascending?: boolean }) => ({
+            limit: (limitValue: number) => ({
+              async then(resolve: any) {
+                const orderDir = options?.ascending === false ? 'DESC' : 'ASC'
+                const query = `SELECT ${columns} FROM ${table} WHERE ${column} >= $1 AND ${column2} <= $2 ORDER BY ${orderColumn} ${orderDir} LIMIT $3`
+                const result = await pool.query(query, [value, value2, limitValue])
+                resolve({ data: result.rows, error: null })
+              }
+            })
+          })
+        })
+      }),
+      order: (orderColumn: string, options?: { ascending?: boolean }) => ({
+        limit: (limitValue: number) => ({
+          async then(resolve: any) {
+            const orderDir = options?.ascending === false ? 'DESC' : 'ASC'
+            const query = `SELECT ${columns} FROM ${table} ORDER BY ${orderColumn} ${orderDir} LIMIT $1`
+            const result = await pool.query(query, [limitValue])
+            resolve({ data: result.rows, error: null })
+          }
+        })
+      })
+    }),
+    insert: (data: any) => ({
+      select: () => ({
+        single: async () => {
+          const keys = Object.keys(data)
+          const values = Object.values(data)
+          const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ')
+          const query = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders}) RETURNING *`
+          const result = await pool.query(query, values)
+          return { data: result.rows[0], error: null }
+        }
+      })
+    }),
+    update: (data: any) => ({
+      eq: (column: string, value: any) => ({
+        async then(resolve: any) {
+          const keys = Object.keys(data)
+          const values = Object.values(data)
+          const setClause = keys.map((key, i) => `${key} = $${i + 1}`).join(', ')
+          const query = `UPDATE ${table} SET ${setClause} WHERE ${column} = $${keys.length + 1} RETURNING *`
+          const result = await pool.query(query, [...values, value])
+          resolve({ data: result.rows[0], error: null })
+        }
+      })
+    })
+  })
+}
 
-// For server components
-export const createServerSupabase = () => createServerComponentClient({ cookies })
+// For compatibility with existing code
+export const createClientSupabase = () => supabase
+export const createServerSupabase = () => supabase
 
 // Database types (will be generated from Supabase)
 export type Database = {

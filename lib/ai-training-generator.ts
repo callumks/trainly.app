@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { createServerSupabase } from './supabase'
+import { db } from './supabase'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -37,7 +37,7 @@ interface TrainingPlanRequest {
 }
 
 export class AITrainingGenerator {
-  private supabase = createServerSupabase()
+  private db = db
 
   async generateTrainingPlan({
     userId,
@@ -76,29 +76,28 @@ export class AITrainingGenerator {
   }
 
   private async getUserProfile(userId: string): Promise<UserProfile> {
-    const { data, error } = await this.supabase
-      .from('profiles')
-      .select('goals, sports, experience_level, weekly_volume')
-      .eq('id', userId)
-      .single()
+    const result = await this.db.query(
+      'SELECT goals, sports, experience_level, weekly_volume FROM profiles WHERE id = $1',
+      [userId]
+    )
 
-    if (error) throw error
-    return data
+    if (result.rows.length === 0) {
+      throw new Error('User profile not found')
+    }
+
+    return result.rows[0]
   }
 
   private async getRecentActivities(userId: string, days: number): Promise<StravaActivity[]> {
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - days)
 
-    const { data, error } = await this.supabase
-      .from('strava_activities')
-      .select('*')
-      .eq('user_id', userId)
-      .gte('start_date', cutoffDate.toISOString())
-      .order('start_date', { ascending: false })
+    const result = await this.db.query(
+      'SELECT * FROM strava_activities WHERE user_id = $1 AND start_date >= $2 ORDER BY start_date DESC',
+      [userId, cutoffDate.toISOString()]
+    )
 
-    if (error) throw error
-    return data || []
+    return result.rows || []
   }
 
   private analyzeFitnessData(activities: StravaActivity[], profile: UserProfile) {
@@ -343,52 +342,54 @@ Make the plan progressive, specific to their current fitness level, and aligned 
   }
 
   private async saveTrainingPlan(userId: string, aiPlan: any) {
-    const supabase = createServerSupabase()
-    
     // Save the main training plan
-    const { data: plan, error: planError } = await supabase
-      .from('training_plans')
-      .insert({
-        user_id: userId,
-        name: aiPlan.name,
-        description: aiPlan.description,
-        start_date: new Date().toISOString().split('T')[0],
-        end_date: new Date(Date.now() + aiPlan.duration_weeks * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        plan_type: 'ai_generated',
-        metadata: {
+    const planResult = await this.db.query(
+      `INSERT INTO training_plans (user_id, name, description, start_date, end_date, plan_type, metadata, ai_generated_insights) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [
+        userId,
+        aiPlan.name,
+        aiPlan.description,
+        new Date().toISOString().split('T')[0],
+        new Date(Date.now() + aiPlan.duration_weeks * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        'ai_generated',
+        JSON.stringify({
           weekly_structure: aiPlan.weekly_structure,
-          phases: aiPlan.phases,
-          ai_insights: aiPlan.ai_insights
-        }
-      })
-      .select()
-      .single()
+          phases: aiPlan.phases
+        }),
+        JSON.stringify(aiPlan.ai_insights)
+      ]
+    )
 
-    if (planError) throw planError
+    const plan = planResult.rows[0]
 
     // Save individual training sessions
     if (aiPlan.sessions && aiPlan.sessions.length > 0) {
-      const sessions = aiPlan.sessions.map((session: any) => ({
-        plan_id: plan.id,
-        user_id: userId,
-        date: this.calculateSessionDate(session.week, session.day_of_week),
-        name: session.name,
-        description: session.description,
-        session_type: session.session_type,
-        duration_minutes: session.duration_minutes,
-        intensity: session.intensity,
-        metadata: {
-          target_pace: session.target_pace,
-          notes: session.notes,
-          ai_generated: true
-        }
-      }))
-
-      const { error: sessionsError } = await supabase
-        .from('training_sessions')
-        .insert(sessions)
-
-      if (sessionsError) throw sessionsError
+      for (const session of aiPlan.sessions) {
+        await this.db.query(
+          `INSERT INTO training_sessions (plan_id, user_id, date, name, description, session_type, duration_minutes, intensity, metadata, ai_recommendations) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+            plan.id,
+            userId,
+            this.calculateSessionDate(session.week, session.day_of_week),
+            session.name,
+            session.description,
+            session.session_type,
+            session.duration_minutes,
+            session.intensity,
+            JSON.stringify({
+              target_pace: session.target_pace,
+              notes: session.notes,
+              ai_generated: true
+            }),
+            JSON.stringify({
+              target_pace: session.target_pace,
+              notes: session.notes
+            })
+          ]
+        )
+      }
     }
 
     return plan
