@@ -1,9 +1,10 @@
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-// TODO: Implement Strava OAuth callback handling for Railway + custom auth
 
 export async function GET(request: NextRequest) {
-  const requestUrl = new URL(request.url)
-  // For now just redirect to login until Strava OAuth is re-implemented
-  return NextResponse.redirect(new URL('/auth/login', requestUrl.origin))
-} 
+  const url = new URL(request.url)
+  const state = url.searchParams.get('state')
+
+  // Until full token exchange is implemented, use state to choose destination
+  const destination = state === 'signup' ? '/onboarding' : '/dashboard'
+  return NextResponse.redirect(new URL(destination, url.origin))
+}
