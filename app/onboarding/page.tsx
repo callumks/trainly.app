@@ -1,23 +1,23 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
+import { db } from '@/lib/supabase'
 import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
 
 export default async function OnboardingPage() {
-  const supabase = createServerComponentClient({ cookies })
-  const { data: { session } } = await supabase.auth.getSession()
+  const token = cookies().get('auth-token')?.value
+  if (!token) redirect('/auth/login')
 
-  if (!session) {
-    redirect('/auth/login')
-  }
+  const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
+  const decoded = jwt.verify(token, secret) as { userId: string; email: string }
 
   // Check if user already completed onboarding
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('goals, sports, experience_level')
-    .eq('id', session.user.id)
-    .single()
+  const result = await db.query(
+    'SELECT goals, sports, experience_level FROM profiles WHERE id = $1',
+    [decoded.userId]
+  )
+  const profile = result.rows[0]
 
   // If profile is complete, redirect to dashboard
   if (profile?.goals && profile?.sports && profile?.experience_level) {
@@ -26,7 +26,7 @@ export default async function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
-      <OnboardingFlow userId={session.user.id} />
+      <OnboardingFlow userId={decoded.userId} />
     </div>
   )
 } 

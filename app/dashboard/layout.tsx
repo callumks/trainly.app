@@ -1,7 +1,7 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 import { DashboardNavigation } from '@/components/dashboard/dashboard-navigation'
 
 export default async function DashboardLayout({
@@ -9,10 +9,15 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createServerComponentClient({ cookies })
-  const { data: { session } } = await supabase.auth.getSession()
+  const token = cookies().get('auth-token')?.value
+  if (!token) {
+    redirect('/auth/login')
+  }
 
-  if (!session) {
+  try {
+    const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
+    jwt.verify(token, secret)
+  } catch {
     redirect('/auth/login')
   }
 

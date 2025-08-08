@@ -1,25 +1,22 @@
 import React from 'react'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
+import { db } from '@/lib/supabase'
 import { DashboardOverview } from '@/components/dashboard/dashboard-overview'
 import { TrainingCalendar } from '@/components/training/training-calendar'
 import { RecentActivities } from '@/components/strava/recent-activities'
 import { AIPlanGenerator } from '@/components/training/ai-plan-generator'
 
 export default async function DashboardPage() {
-  const supabase = createServerComponentClient({ cookies })
-  const { data: { session } } = await supabase.auth.getSession()
+  const token = cookies().get('auth-token')?.value
+  if (!token) return null
 
-  if (!session) {
-    return null
-  }
+  const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
+  const decoded = jwt.verify(token, secret) as { userId: string; email: string }
 
   // Get user profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', session.user.id)
-    .single()
+  const profileResult = await db.query('SELECT * FROM profiles WHERE id = $1', [decoded.userId])
+  const profile = profileResult.rows[0]
 
   return (
     <div className="space-y-8 p-8">
@@ -32,14 +29,14 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <DashboardOverview userId={session.user.id} />
+      <DashboardOverview userId={decoded.userId} />
       
       {/* AI Training Plan Generator */}
       <AIPlanGenerator />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <TrainingCalendar userId={session.user.id} />
-        <RecentActivities userId={session.user.id} />
+        <TrainingCalendar userId={decoded.userId} />
+        <RecentActivities userId={decoded.userId} />
       </div>
     </div>
   )

@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 import { aiTrainingGenerator } from '@/lib/ai-training-generator'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // Check authentication via JWT cookie
+    const token = cookies().get('auth-token')?.value
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
+    const decoded = jwt.verify(token, secret) as { userId: string }
 
     // Parse request body
     const body = await request.json()
@@ -23,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Generate the training plan
     const trainingPlan = await aiTrainingGenerator.generateTrainingPlan({
-      userId: session.user.id,
+      userId: decoded.userId,
       planDuration,
       focusArea,
       specificGoal
