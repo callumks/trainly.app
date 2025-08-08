@@ -73,7 +73,9 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
     try {
       // For now, redirect to Strava OAuth manually
       // TODO: Implement proper Strava OAuth flow
-      const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/callback')}&approval_prompt=force&scope=read,activity:read_all`
+      const appBaseUrl = (process.env.NEXT_PUBLIC_APP_URL as string) || window.location.origin
+      const redirectUri = `${appBaseUrl.replace(/\/$/, '')}/auth/callback`
+      const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&approval_prompt=force&scope=read,activity:read_all`
       window.location.href = stravaAuthUrl
     } catch (error: any) {
       toast.error(error.message || 'Failed to connect with Strava')

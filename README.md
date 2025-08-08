@@ -46,7 +46,7 @@ A full-stack, AI-powered training platform for hybrid athletes built with Next.j
 - **AI**: OpenAI GPT-4o for training plan generation
 - **Payments**: Stripe for subscription management
 - **OAuth**: Strava API integration
-- **Deployment**: Vercel-ready
+- **Deployment**: Railway-ready
 
 ## 🚀 Quick Start
 
@@ -91,6 +91,8 @@ STRIPE_WEBHOOK_SECRET=your-stripe-webhook-secret
 OPENAI_API_KEY=your-openai-api-key
 
 # App
+# Local: use http://localhost:3000
+# Prod: set to https://www.trainly.app in your environment
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -108,7 +110,8 @@ cat supabase/schema.sql
 **Strava OAuth:**
 
 1. Create app at [Strava Developers](https://developers.strava.com/)
-2. Set callback URL: `http://localhost:3000/auth/callback`
+2. Set callback URL (dev): `http://localhost:3000/auth/callback`
+   Set callback URL (prod): `https://www.trainly.app/auth/callback`
 3. Add client ID/secret to environment variables
 
 **Supabase Auth:**
