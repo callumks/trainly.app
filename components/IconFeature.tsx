@@ -1,4 +1,4 @@
-'use client'
+// Server Component: allows passing icon components from server to client without function-prop errors
 
 import React from 'react'
 import { LucideIcon } from 'lucide-react'
