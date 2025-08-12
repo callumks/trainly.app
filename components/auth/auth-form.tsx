@@ -73,7 +73,11 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
     try {
       // For now, redirect to Strava OAuth manually
       // TODO: Implement proper Strava OAuth flow
-      const appBaseUrl = (process.env.NEXT_PUBLIC_APP_URL as string) || window.location.origin
+      const configuredBase = process.env.NEXT_PUBLIC_APP_URL as string | undefined
+      const normalizedBase = configuredBase
+        ? (/^https?:\/\//i.test(configuredBase) ? configuredBase : `https://${configuredBase}`)
+        : undefined
+      const appBaseUrl = normalizedBase || window.location.origin
       const redirectUri = `${appBaseUrl.replace(/\/$/, '')}/auth/callback`
       const state = isSignUp ? 'signup' : 'login'
       const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&approval_prompt=force&scope=read,activity:read_all&state=${encodeURIComponent(state)}`
