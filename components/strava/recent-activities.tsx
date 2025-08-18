@@ -29,6 +29,7 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([])
   const [loading, setLoading] = useState(true)
   const [hasStrava, setHasStrava] = useState(false)
+  const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -126,9 +127,25 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
             <p className="text-muted-foreground mb-4">
               Connect your Strava account to automatically track your activities and get AI-powered insights.
             </p>
-            <Button>
+            <Button
+              onClick={async () => {
+                try {
+                  setSyncing(true)
+                  const res = await fetch('/api/strava/sync')
+                  const j = await res.json()
+                  if (!res.ok) throw new Error(j.error || 'Sync failed')
+                  // refresh list after sync
+                  window.location.reload()
+                } catch (e) {
+                  console.error(e)
+                } finally {
+                  setSyncing(false)
+                }
+              }}
+              disabled={syncing}
+            >
               <Activity className="mr-2 h-4 w-4" />
-              Connect Strava
+              {syncing ? 'Syncing…' : 'Sync from Strava'}
             </Button>
           </div>
         </CardContent>
@@ -141,6 +158,28 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
       <CardHeader>
         <CardTitle>Recent Activities</CardTitle>
         <CardDescription>Your latest Strava activities</CardDescription>
+        <div className="mt-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={async () => {
+              try {
+                setSyncing(true)
+                const res = await fetch('/api/strava/sync')
+                const j = await res.json()
+                if (!res.ok) throw new Error(j.error || 'Sync failed')
+                window.location.reload()
+              } catch (e) {
+                console.error(e)
+              } finally {
+                setSyncing(false)
+              }
+            }}
+            disabled={syncing}
+          >
+            {syncing ? 'Syncing…' : 'Sync now'}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {activities.length === 0 ? (
