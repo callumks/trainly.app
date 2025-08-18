@@ -21,7 +21,7 @@ export function AIPlanGenerator() {
   const router = useRouter()
   const [isGenerating, setIsGenerating] = useState(false)
   const [planDuration, setPlanDuration] = useState('8')
-  const [focusArea, setFocusArea] = useState('')
+  const [focusArea, setFocusArea] = useState('none')
   const [specificGoal, setSpecificGoal] = useState('')
 
   const focusAreas = [
@@ -49,7 +49,7 @@ export function AIPlanGenerator() {
         },
         body: JSON.stringify({
           planDuration: parseInt(planDuration),
-          focusArea: focusArea || undefined,
+          focusArea: focusArea === 'none' ? undefined : focusArea,
           specificGoal: specificGoal || undefined,
         }),
       })
@@ -68,7 +68,7 @@ export function AIPlanGenerator() {
       
       // Reset form
       setPlanDuration('8')
-      setFocusArea('')
+      setFocusArea('none')
       setSpecificGoal('')
       
     } catch (error: any) {
@@ -136,7 +136,7 @@ export function AIPlanGenerator() {
                 <SelectValue placeholder="Choose focus area" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No specific focus</SelectItem>
+                <SelectItem value="none">No specific focus</SelectItem>
                 {focusAreas.map((area) => (
                   <SelectItem key={area.value} value={area.value}>
                     {area.label}
