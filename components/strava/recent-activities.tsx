@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Activity, ExternalLink } from 'lucide-react'
 import { formatDate, formatTime } from '@/lib/utils'
 import { useSupabase } from '@/components/providers/supabase-provider'
+import toast from 'react-hot-toast'
+import { StravaConnectButton } from '@/components/strava/connect-button'
 
 interface RecentActivitiesProps {
   userId: string
@@ -127,26 +129,9 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
             <p className="text-muted-foreground mb-4">
               Connect your Strava account to automatically track your activities and get AI-powered insights.
             </p>
-            <Button
-              onClick={async () => {
-                try {
-                  setSyncing(true)
-                  const res = await fetch('/api/strava/sync')
-                  const j = await res.json()
-                  if (!res.ok) throw new Error(j.error || 'Sync failed')
-                  // refresh list after sync
-                  window.location.reload()
-                } catch (e) {
-                  console.error(e)
-                } finally {
-                  setSyncing(false)
-                }
-              }}
-              disabled={syncing}
-            >
-              <Activity className="mr-2 h-4 w-4" />
-              {syncing ? 'Syncing…' : 'Sync from Strava'}
-            </Button>
+            <div className="flex items-center justify-center">
+              <StravaConnectButton />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -168,9 +153,11 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
                 const res = await fetch('/api/strava/sync')
                 const j = await res.json()
                 if (!res.ok) throw new Error(j.error || 'Sync failed')
+                toast.success(`Synced: ${j.inserted || 0} new, ${j.updated || 0} updated`)
                 window.location.reload()
-              } catch (e) {
+              } catch (e: any) {
                 console.error(e)
+                toast.error(e?.message || 'Sync failed')
               } finally {
                 setSyncing(false)
               }
