@@ -216,7 +216,7 @@ export class AITrainingGenerator {
     })
 
     const completion = await getOpenAIClient().chat.completions.create({
-      model: "gpt-4",
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         {
           role: "system",
