@@ -86,6 +86,22 @@ export function TrainingCalendar({ userId }: TrainingCalendarProps) {
     }
   }
 
+  const moveSession = async (sessionId: string) => {
+    const newDate = prompt('Move to date (YYYY-MM-DD):')
+    if (!newDate) return
+    try {
+      const res = await fetch('/api/sessions/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, newDate })
+      })
+      if (!res.ok) throw new Error('Move failed')
+      window.location.reload()
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   if (loading) {
     return (
       <Card>
@@ -152,6 +168,7 @@ export function TrainingCalendar({ userId }: TrainingCalendarProps) {
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusBadge(session.status)}
+                  <button className="text-xs underline" onClick={() => moveSession(session.id)}>Move</button>
                 </div>
               </div>
             ))}
