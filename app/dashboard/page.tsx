@@ -6,6 +6,7 @@ import { DashboardOverview } from '@/components/dashboard/dashboard-overview'
 import { TrainingCalendar } from '@/components/training/training-calendar'
 import { RecentActivities } from '@/components/strava/recent-activities'
 import { AIPlanGenerator } from '@/components/training/ai-plan-generator'
+import { StravaConnectButton } from '@/components/strava/connect-button'
 
 export default async function DashboardPage() {
   const token = cookies().get('auth-token')?.value
@@ -38,6 +39,12 @@ export default async function DashboardPage() {
         <TrainingCalendar userId={decoded.userId} />
         <RecentActivities userId={decoded.userId} />
       </div>
+
+      {!profile?.strava_id && (
+        <div className="mt-4">
+          <StravaConnectButton />
+        </div>
+      )}
     </div>
   )
 } 

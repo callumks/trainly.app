@@ -28,7 +28,7 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
   const { supabase } = useSupabase()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [isStravaLoading, setIsStravaLoading] = useState(false)
+  const [isStravaLoading] = useState(false)
 
   const {
     register,
@@ -68,42 +68,11 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
     }
   }
 
-  const handleStravaAuth = async () => {
-    setIsStravaLoading(true)
-    try {
-      // For now, redirect to Strava OAuth manually
-      // TODO: Implement proper Strava OAuth flow
-      const configuredBase = process.env.NEXT_PUBLIC_APP_URL as string | undefined
-      const normalizedBase = configuredBase
-        ? (/^https?:\/\//i.test(configuredBase) ? configuredBase : `https://${configuredBase}`)
-        : undefined
-      const appBaseUrl = normalizedBase || window.location.origin
-      const redirectUri = `${appBaseUrl.replace(/\/$/, '')}/auth/callback`
-      const state = isSignUp ? 'signup' : 'login'
-      const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&approval_prompt=force&scope=read,activity:read_all&state=${encodeURIComponent(state)}`
-      window.location.href = stravaAuthUrl
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to connect with Strava')
-      setIsStravaLoading(false)
-    }
-  }
+  // Strava connect moved to dashboard; gated behind an existing session
 
   return (
     <div className="space-y-6">
-      {/* Strava OAuth */}
-      <Button
-        onClick={handleStravaAuth}
-        disabled={isStravaLoading}
-        className="w-full bg-[#FC4C02] hover:bg-[#FC4C02]/90 text-white"
-        size="lg"
-      >
-        {isStravaLoading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Activity className="mr-2 h-4 w-4" />
-        )}
-        {isSignUp ? 'Sign up' : 'Continue'} with Strava
-      </Button>
+      {/* Strava OAuth moved to dashboard after login */}
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
