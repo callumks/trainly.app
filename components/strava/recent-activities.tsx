@@ -36,14 +36,12 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        // Check if user has Strava connected
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('strava_id')
-          .eq('id', userId)
-          .single()
-
-        if (!profile?.strava_id) {
+        // Check if user has Strava connected via API (not client mock)
+        const profRes = await fetch('/api/profile')
+        if (!profRes.ok) throw new Error('Failed to load profile')
+        const prof = await profRes.json()
+        const stravaLinked = Boolean(prof?.profile?.strava_id)
+        if (!stravaLinked) {
           setHasStrava(false)
           setLoading(false)
           return
