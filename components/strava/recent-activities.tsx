@@ -52,15 +52,11 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
         setHasStrava(true)
 
         // Fetch recent activities
-        const { data, error } = await supabase
-          .from('strava_activities')
-          .select('*')
-          .eq('user_id', userId)
-          .order('start_date', { ascending: false })
-          .limit(5)
-
-        if (error) throw error
-        setActivities(data || [])
+        // Fetch from API so we don't depend on client mock
+        const res = await fetch('/api/activities/recent')
+        if (!res.ok) throw new Error('Failed to load activities')
+        const j = await res.json()
+        setActivities(j.activities || [])
       } catch (error) {
         console.error('Error fetching activities:', error)
       } finally {
