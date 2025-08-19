@@ -30,56 +30,14 @@ export function DashboardOverview({ userId }: DashboardOverviewProps) {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Get this week's date range
-        const now = new Date()
-        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()))
-        const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6))
-
-        // Fetch weekly activities
-        const { count: activitiesCount } = await supabase
-          .from('strava_activities')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .gte('start_date', startOfWeek.toISOString())
-          .lte('start_date', endOfWeek.toISOString())
-
-        // Fetch completed sessions
-        const { count: completedCount } = await supabase
-          .from('training_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .eq('status', 'completed')
-          .gte('date', startOfWeek.toISOString())
-          .lte('date', endOfWeek.toISOString())
-
-        // Fetch upcoming sessions (next 7 days)
-        const nextWeek = new Date()
-        nextWeek.setDate(nextWeek.getDate() + 7)
-        
-        const { count: upcomingCount } = await supabase
-          .from('training_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .eq('status', 'planned')
-          .gte('date', new Date().toISOString())
-          .lte('date', nextWeek.toISOString())
-
-        // Calculate weekly progress (completed vs planned sessions)
-        const { count: plannedCount } = await supabase
-          .from('training_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .in('status', ['planned', 'completed'])
-          .gte('date', startOfWeek.toISOString())
-          .lte('date', endOfWeek.toISOString())
-
-        const progress = plannedCount ? Math.round((completedCount! / plannedCount) * 100) : 0
-
+        const res = await fetch('/api/dashboard/overview')
+        if (!res.ok) throw new Error('Failed to load overview')
+        const j = await res.json()
         setStats({
-          weeklyActivities: activitiesCount || 0,
-          completedSessions: completedCount || 0,
-          upcomingSessions: upcomingCount || 0,
-          weeklyProgress: progress,
+          weeklyActivities: j.weeklyActivities || 0,
+          completedSessions: j.completedSessions || 0,
+          upcomingSessions: j.upcomingSessions || 0,
+          weeklyProgress: j.weeklyProgress || 0,
         })
       } catch (error) {
         console.error('Error fetching dashboard stats:', error)

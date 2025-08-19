@@ -29,21 +29,10 @@ export function TrainingCalendar({ userId }: TrainingCalendarProps) {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        // Get next 7 days of sessions
-        const today = new Date()
-        const nextWeek = new Date()
-        nextWeek.setDate(today.getDate() + 7)
-
-        const { data, error } = await supabase
-          .from('training_sessions')
-          .select('*')
-          .eq('user_id', userId)
-          .gte('date', today.toISOString().split('T')[0])
-          .lte('date', nextWeek.toISOString().split('T')[0])
-          .order('date', { ascending: true })
-
-        if (error) throw error
-        setSessions(data || [])
+        const res = await fetch('/api/sessions/upcoming')
+        if (!res.ok) throw new Error('Failed to load sessions')
+        const j = await res.json()
+        setSessions(j.sessions || [])
       } catch (error) {
         console.error('Error fetching training sessions:', error)
       } finally {
