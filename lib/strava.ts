@@ -106,6 +106,9 @@ export async function syncStravaActivitiesForUser(userId: string): Promise<{ ins
   let inserted = 0
   let updated = 0
   for (const a of activities) {
+    const avgHr = a.average_heartrate != null ? Math.round(Number(a.average_heartrate)) : null
+    const maxHr = a.max_heartrate != null ? Math.round(Number(a.max_heartrate)) : null
+    const suffer = a.suffer_score != null ? Math.round(Number(a.suffer_score)) : null
     const values = [
       userId,
       String(a.id),
@@ -118,9 +121,9 @@ export async function syncStravaActivitiesForUser(userId: string): Promise<{ ins
       a.start_date,
       a.average_speed ?? null,
       a.max_speed ?? null,
-      a.average_heartrate ?? null,
-      a.max_heartrate ?? null,
-      a.suffer_score ?? null,
+      avgHr,
+      maxHr,
+      suffer,
       a ? JSON.stringify(a) : null,
     ]
 
