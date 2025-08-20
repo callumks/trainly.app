@@ -14,7 +14,7 @@ export function GeneratorPanel({ onGenerate }: { onGenerate: (payload: { duratio
     <Card className="p-5 md:p-6 bg-gradient-to-b from-card to-[#0B1324] border-border/70">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-sm uppercase tracking-wider text-brand-200">AI Training Plan Generator</n>
+          <div className="text-sm uppercase tracking-wider text-brand-200">AI Training Plan Generator</div>
           <h2 className="text-xl font-semibold mt-1">Create a personalized plan from your Strava data</h2>
         </div>
         <div className="hidden md:block text-xs text-muted-foreground px-2 py-1 rounded bg-secondary/40 border border-border">Beta</div>
