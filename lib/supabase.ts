@@ -1,13 +1,22 @@
 import { Pool } from 'pg'
 
-// Database connection for Railway PostgreSQL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-})
+// Lazy database connection for Railway PostgreSQL
+let pool: Pool | null = null
+function ensurePool(): Pool {
+  if (!pool) {
+    const connectionString = process.env.DATABASE_URL
+    pool = new Pool({
+      connectionString,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    })
+  }
+  return pool
+}
 
-// Export the database pool for use in API routes
-export const db = pool
+// Thin wrapper to avoid creating Pool at module import time
+export const db = {
+  query: (text: string, params?: any[]) => ensurePool().query(text, params as any),
+}
 
 // Simple database client for consistency with existing code
 export const supabase = {
@@ -16,12 +25,12 @@ export const supabase = {
       eq: (column: string, value: any) => ({
         single: async () => {
           const query = `SELECT ${columns} FROM ${table} WHERE ${column} = $1 LIMIT 1`
-          const result = await pool.query(query, [value])
+          const result = await ensurePool().query(query, [value])
           return { data: result.rows[0] || null, error: null }
         },
         async then(resolve: any) {
           const query = `SELECT ${columns} FROM ${table} WHERE ${column} = $1`
-          const result = await pool.query(query, [value])
+          const result = await ensurePool().query(query, [value])
           resolve({ data: result.rows, error: null })
         }
       }),
@@ -32,7 +41,7 @@ export const supabase = {
               async then(resolve: any) {
                 const orderDir = options?.ascending === false ? 'DESC' : 'ASC'
                 const query = `SELECT ${columns} FROM ${table} WHERE ${column} >= $1 AND ${column2} <= $2 ORDER BY ${orderColumn} ${orderDir} LIMIT $3`
-                const result = await pool.query(query, [value, value2, limitValue])
+                const result = await ensurePool().query(query, [value, value2, limitValue])
                 resolve({ data: result.rows, error: null })
               }
             })
@@ -44,7 +53,7 @@ export const supabase = {
           async then(resolve: any) {
             const orderDir = options?.ascending === false ? 'DESC' : 'ASC'
             const query = `SELECT ${columns} FROM ${table} ORDER BY ${orderColumn} ${orderDir} LIMIT $1`
-            const result = await pool.query(query, [limitValue])
+            const result = await ensurePool().query(query, [limitValue])
             resolve({ data: result.rows, error: null })
           }
         })
@@ -57,7 +66,7 @@ export const supabase = {
           const values = Object.values(data)
           const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ')
           const query = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders}) RETURNING *`
-          const result = await pool.query(query, values)
+          const result = await ensurePool().query(query, values)
           return { data: result.rows[0], error: null }
         }
       })
@@ -69,7 +78,7 @@ export const supabase = {
           const values = Object.values(data)
           const setClause = keys.map((key, i) => `${key} = $${i + 1}`).join(', ')
           const query = `UPDATE ${table} SET ${setClause} WHERE ${column} = $${keys.length + 1} RETURNING *`
-          const result = await pool.query(query, [...values, value])
+          const result = await ensurePool().query(query, [...values, value])
           resolve({ data: result.rows[0], error: null })
         }
       })

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readActivePlan, writePlan } from '@/lib/plan'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id') || '00000000-0000-0000-0000-000000000001'

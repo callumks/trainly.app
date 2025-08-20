@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readActivePlan, writePlan } from '@/lib/plan'
 import { Plan } from '@/lib/types'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: NextRequest) {
   try {
     const { userId, activity } = await req.json()

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { diffPlan } from '@/lib/plan'
 import { Plan } from '@/lib/types'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: NextRequest) {
   try {
     const { prev, next } = await req.json()

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Plan } from "@/lib/types";
 import { readActivePlan, writePlan } from "@/lib/plan";
 
+export const runtime = 'nodejs'
+
 // Minimal plan CRUD
 export async function GET(req: NextRequest) {
   try {
