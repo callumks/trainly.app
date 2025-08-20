@@ -235,7 +235,7 @@ export class AITrainingGenerator {
     const aiResponse = completion.choices[0]?.message?.content
     if (!aiResponse) throw new Error('No response from AI')
 
-    // Try strict JSON parse, then sanitize and retry once before falling back
+    // Always sanitize AI output before parsing
     const tryParse = (text: string) => JSON.parse(text)
     const sanitize = (text: string) => {
       let t = text.trim()
@@ -251,17 +251,11 @@ export class AITrainingGenerator {
     }
 
     try {
-      return tryParse(aiResponse)
-    } catch (_) {
-      try {
-        const sanitized = sanitize(aiResponse)
-        return tryParse(sanitized)
-      } catch (parseError) {
-        console.error('Failed to parse AI response:', parseError)
-        console.error('AI raw head:', aiResponse.slice(0, 200))
-        console.error('AI sanitized head:', sanitize(aiResponse).slice(0, 200))
-        return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
-      }
+      const sanitized = sanitize(aiResponse)
+      return tryParse(sanitized)
+    } catch (parseError) {
+      console.error('Failed to parse AI response after sanitize:', parseError)
+      return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
     }
   }
 
