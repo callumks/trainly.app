@@ -34,7 +34,9 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
             Coach
           </div>
           <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight text-zinc-100">Let’s build your plan.</h1>
-          <p className="mt-2 text-zinc-400">Tell me about you as an athlete. I’ll generate a hybrid week that adapts as you train.</p>
+          <div className="mt-3 inline-flex max-w-xl rounded-2xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-zinc-300">
+            Hey, I’m your coach. Tell me about yourself—sports, goals, schedule, any injuries. I’ll tune your hybrid week.
+          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -57,6 +59,11 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
                 ))}
               </div>
 
+              <div className="mb-4 rounded-lg border border-neutral-800 bg-neutral-950/60 p-3 text-sm text-zinc-300 cursor-pointer hover:bg-neutral-900/50 transition" onClick={()=> setText(SEED)}>
+                <div className="mb-1 text-xs text-zinc-500">Example profile</div>
+                {SEED}
+              </div>
+
               <Textarea
                 rows={5}
                 value={text}
@@ -67,7 +74,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
               />
 
               <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
-                <div className="text-xs text-zinc-500 flex items-center gap-2"><Shield className="h-3.5 w-3.5" /> Your data stays private. We only use it to build plans.</div>
+                <div className="text-xs text-zinc-500 flex items-center gap-2"><Shield className="h-3.5 w-3.5" /> Your coach only uses this info to adapt your training.</div>
                 <div className="flex items-center gap-2">
                   <Button variant="secondary" onClick={()=>{ setText(SEED); navigator.clipboard.writeText(SEED); setCopied(true); setTimeout(()=>setCopied(false), 1200) }}>
                     {copied ? <Check className="mr-2 h-4 w-4" /> : <Clipboard className="mr-2 h-4 w-4" />} Use example
