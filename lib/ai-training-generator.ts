@@ -239,8 +239,8 @@ export class AITrainingGenerator {
     const tryParse = (text: string) => JSON.parse(text)
     const sanitize = (text: string) => {
       let t = text.trim()
-      // remove code fences
-      t = t.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim()
+      // remove any markdown code fences anywhere
+      t = t.replace(/```json\s*/gi, '').replace(/```/g, '').trim()
       // extract first {...} block if extra prose exists
       const first = t.indexOf('{')
       const last = t.lastIndexOf('}')
