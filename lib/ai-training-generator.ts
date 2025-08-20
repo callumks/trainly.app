@@ -268,7 +268,7 @@ export class AITrainingGenerator {
                     target_pace: { type: 'string' },
                     notes: { type: 'string' }
                   },
-                  required: ['week','day_of_week','name','session_type','duration_minutes','intensity']
+                  required: ['week','day_of_week','name','session_type','duration_minutes','intensity','description','target_pace','notes']
                 }
               },
               ai_insights: {
@@ -279,7 +279,8 @@ export class AITrainingGenerator {
                   progression_strategy: { type: 'string' },
                   key_adaptations: { type: 'string' },
                   recovery_emphasis: { type: 'string' }
-                }
+                },
+                required: ['plan_rationale','progression_strategy','key_adaptations','recovery_emphasis']
               }
             },
             required: ['name','description','duration_weeks','weekly_structure','phases','sessions','ai_insights']
