@@ -1,9 +1,8 @@
 'use client'
 import React, { useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { StravaConnectButton } from '@/components/strava/connect-button'
+import { Textarea } from '@/components/ui/textarea'
 
 const SEED = `I’m a cyclist and climber, currently Cat 5 aiming for Cat 2/3 by year‑end. Past A3 pulley and meniscus issues—want to train hard without re‑injury. Confident at V5, aiming for V9. I can train 6 days/week, prefer long Z2 rides and 2 bouldering sessions.`
 
