@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           {/* Right rail */}
           <div className="space-y-4">
             <ActivitySyncBanner hasNew={false} />
-            <NutritionPanel enabled={!!plan?.weeks?.[0]?.nutrition?.enabled} onToggle={async ()=>{}} />
+            <NutritionPanel enabled={!!plan?.weeks?.[0]?.nutrition?.enabled} />
             {!profile?.strava_id && (
               <div>
                 <StravaConnectButton />
