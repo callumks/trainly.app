@@ -307,10 +307,22 @@ export class AITrainingGenerator {
     const choice = completion.choices[0]
     const toolCall = choice?.message?.tool_calls?.[0]
     if (toolCall?.function?.arguments) {
+      const rawArgs = toolCall.function.arguments
       try {
-        return JSON.parse(toolCall.function.arguments)
-      } catch (e) {
-        console.error('Failed to parse tool arguments:', e)
+        return JSON.parse(rawArgs)
+      } catch (_) {
+        try {
+          // Sanitize any accidental fences or extra prose
+          let t = rawArgs.trim().replace(/```json\s*/gi, '').replace(/```/g, '').trim()
+          const first = t.indexOf('{')
+          const last = t.lastIndexOf('}')
+          if (first !== -1 && last !== -1 && last > first) {
+            t = t.slice(first, last + 1)
+          }
+          return JSON.parse(t)
+        } catch (e) {
+          console.error('Failed to parse tool arguments:', e)
+        }
       }
     }
 
