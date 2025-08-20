@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
           tool_choice: { type: "function", name: "return_training_plan" } as any
         });
 
-        const blocks = (resp.output?.[0]?.content ?? []) as any[];
+        const blocks = (((resp as any).output?.[0]?.content) ?? []) as any[];
         const tool = blocks.find(b => b.type === 'tool_use' || b.type === 'tool_call');
         if (tool) {
           if (tool.type === 'tool_use') {
