@@ -2,7 +2,7 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
-import { DashboardNavigation } from '@/components/dashboard/dashboard-navigation'
+import Sidebar from '@/components/nav/Sidebar'
 
 export default async function DashboardLayout({
   children,
@@ -22,13 +22,9 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardNavigation />
-      <main className="lg:pl-72">
-        <div className="xl:pl-96">
-          {children}
-        </div>
-      </main>
+    <div className="min-h-dvh grid grid-cols-1 lg:grid-cols-[260px_1fr]">
+      <Sidebar />
+      <div className="min-h-dvh">{children}</div>
     </div>
   )
 } 
