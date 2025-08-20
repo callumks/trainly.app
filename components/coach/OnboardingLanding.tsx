@@ -40,20 +40,20 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Input column */}
           <div className="lg:col-span-2 space-y-4">
-            <Card className="p-4 md:p-6 bg-neutral-950/60 border-neutral-800">
+            <Card className="p-4 md:p-6 border border-white/10 bg-white/5 backdrop-blur-md">
               <div className="mb-3 flex flex-wrap gap-2">
                 {SPORTS.map(s => (
-                  <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-sm border transition ${chips.includes(s) ? 'bg-neutral-800 border-neutral-700 text-zinc-200' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
+                  <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-sm border transition ${chips.includes(s) ? 'bg-neutral-800 border-neutral-600 text-zinc-100 ring-1 ring-white/20 shadow-[0_0_12px_rgba(255,255,255,0.06)]' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
                 ))}
               </div>
               <div className="mb-3 flex flex-wrap gap-2">
                 {TIME.map(s => (
-                  <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-sm border transition ${chips.includes(s) ? 'bg-neutral-800 border-neutral-700 text-zinc-200' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
+                  <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-sm border transition ${chips.includes(s) ? 'bg-neutral-800 border-neutral-600 text-zinc-100 ring-1 ring-white/20 shadow-[0_0_12px_rgba(255,255,255,0.06)]' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
                 ))}
               </div>
               <div className="mb-4 flex flex-wrap gap-2">
                 {GOALS.map(s => (
-                  <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-sm border transition ${chips.includes(s) ? 'bg-neutral-800 border-neutral-700 text-zinc-200' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
+                  <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-sm border transition ${chips.includes(s) ? 'bg-neutral-800 border-neutral-600 text-zinc-100 ring-1 ring-white/20 shadow-[0_0_12px_rgba(255,255,255,0.06)]' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
                 ))}
               </div>
 
@@ -63,7 +63,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
                 onChange={(e)=>setText(e.target.value)}
                 placeholder="Paste the example or describe your sports, goals, schedule, injuries. Enter to send, Shift+Enter for newline."
                 onKeyDown={(e)=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); onSubmit(buildPrompt()) } }}
-                className="bg-neutral-950 border-neutral-800 focus-visible:ring-zinc-700"
+                className="bg-black border-neutral-800 focus-visible:ring-zinc-700"
               />
 
               <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
@@ -72,7 +72,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
                   <Button variant="secondary" onClick={()=>{ setText(SEED); navigator.clipboard.writeText(SEED); setCopied(true); setTimeout(()=>setCopied(false), 1200) }}>
                     {copied ? <Check className="mr-2 h-4 w-4" /> : <Clipboard className="mr-2 h-4 w-4" />} Use example
                   </Button>
-                  <Button onClick={()=> onSubmit(buildPrompt())}>
+                  <Button onClick={()=> onSubmit(buildPrompt())} className="bg-blue-600 hover:bg-blue-600/90">
                     <Sparkles className="mr-2 h-4 w-4" /> Generate plan
                   </Button>
                 </div>
@@ -83,14 +83,14 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
           {/* Right rail */}
           <div className="space-y-4">
             {!stravaConnected && (
-              <Card className="p-5 border-neutral-800 bg-neutral-950/60">
+              <Card className="p-5 border border-white/10 bg-white/5 backdrop-blur-md">
                 <div className="flex items-center gap-2 text-sm text-zinc-300 mb-2"><Activity className="h-4 w-4" /> Strava</div>
                 <div className="text-sm text-zinc-400 mb-3">Connect Strava to analyze your recent training and auto‑adapt your plan.</div>
                 <StravaConnectButton />
               </Card>
             )}
 
-            <Card className="p-5 border-neutral-800 bg-neutral-950/60">
+            <Card className="p-5 border border-white/10 bg-white/5 backdrop-blur-md">
               <div className="text-sm text-zinc-400 mb-2">Quick prompts</div>
               <div className="flex flex-wrap gap-2">
                 {['Build a balanced hybrid week','2 bouldering sessions + long Z2 ride','Deload this week by 20%','Focus on FTP gains'].map(p => (
