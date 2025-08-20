@@ -217,17 +217,18 @@ export class AITrainingGenerator {
 
     const completion = await getOpenAIClient().chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      response_format: { type: 'json_object' },
       messages: [
         {
           role: "system",
-          content: "You are an expert endurance coach and exercise physiologist. Create detailed, personalized training plans based on the athlete's data and goals. Respond with a JSON object containing the training plan structure."
+          content: "You are an expert endurance coach and exercise physiologist. Create detailed, personalized training plans based on the athlete's data and goals. Return ONLY a valid JSON object, with no code fences, no markdown, and no commentary."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.7,
+      temperature: 0.5,
       max_tokens: 2500
     })
 
