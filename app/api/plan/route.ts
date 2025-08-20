@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       tool_choice: { type: "function", name: "return_training_plan" } as any
     });
 
-    const blocks = (response.output?.[0]?.content ?? []) as any[];
+    const blocks = (((response as any).output?.[0]?.content) ?? []) as any[];
     const call = blocks.find((b) => b.type === "tool_use" || b.type === "tool_call");
     const argsStr: string | undefined = call?.input ? JSON.stringify(call.input) : call?.function?.arguments;
 
