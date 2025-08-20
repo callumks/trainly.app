@@ -1,13 +1,28 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: ["class"],
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    container: { center: true, padding: "2rem" },
     extend: {
       colors: {
+        brand: {
+          DEFAULT: "#6AA2FF",
+          50: "#F2F7FF",
+          100: "#E6F0FF",
+          200: "#C7DCFF",
+          300: "#A7C8FF",
+          400: "#89B5FF",
+          500: "#6AA2FF",
+          600: "#4A87F0",
+          700: "#386BD0",
+          800: "#2B53A6",
+          900: "#1D3873"
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -44,8 +59,15 @@ module.exports = {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+      },
+      boxShadow: {
+        soft: "0 6px 24px rgba(106,162,255,0.08)",
+        ring: "0 0 0 2px rgba(106,162,255,0.35)",
+      },
+      fontFamily: {
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -61,6 +83,9 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      transitionTimingFunction: {
+        "ease-out-curve": "cubic-bezier(.22,1,.36,1)",
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -5,7 +5,9 @@ import { db } from '@/lib/supabase'
 import { DashboardOverview } from '@/components/dashboard/dashboard-overview'
 import { TrainingCalendar } from '@/components/training/training-calendar'
 import { RecentActivities } from '@/components/strava/recent-activities'
-import { AIPlanGenerator } from '@/components/training/ai-plan-generator'
+import { GeneratorPanel } from '@/components/generator-panel'
+import { PageHeader } from '@/components/ui/page-header'
+import { ProgressRing } from '@/components/ui/progress-ring'
 import { StravaConnectButton } from '@/components/strava/connect-button'
 
 export default async function DashboardPage() {
@@ -21,19 +23,25 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 p-8">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">
-          Welcome back{profile?.full_name ? `, ${profile.full_name}` : ''}!
-        </h2>
-        <p className="text-muted-foreground">
-          Here's what's happening with your training.
-        </p>
-      </div>
+      <PageHeader
+        title={`Welcome back${profile?.full_name ? `, ${profile.full_name}` : ''}!`}
+        subtitle="Here’s what’s happening with your training."
+        actions={(
+          <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-soft">
+              <ProgressRing value={42} />
+              <div>
+                <div className="text-xs text-muted-foreground">This week</div>
+                <div className="text-sm font-medium">42% complete</div>
+              </div>
+            </div>
+          </div>
+        )}
+      />
 
       <DashboardOverview userId={decoded.userId} />
       
-      {/* AI Training Plan Generator */}
-      <AIPlanGenerator />
+      <GeneratorPanel onGenerate={() => { /* wire to /api/plan or chat */ }} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <TrainingCalendar userId={decoded.userId} />
