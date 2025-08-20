@@ -207,133 +207,153 @@ export class AITrainingGenerator {
     focusArea?: string
     specificGoal?: string
   }) {
-    const prompt = this.buildTrainingPrompt({
-      profile,
-      fitnessAnalysis,
-      planDuration,
-      focusArea,
-      specificGoal
-    })
+    const userSport = Array.isArray(profile.sports) && profile.sports.length > 0 ? profile.sports[0] : 'cycling'
+    const userLevel = profile.experience_level || 'intermediate'
+    const userGoal = specificGoal || (Array.isArray(profile.goals) && profile.goals[0]) || 'General fitness'
+    const userPrompt = `Athlete: ${userSport}, ${userLevel} level, goal = ${userGoal}. Generate week 1.`
 
-    const completion = await getOpenAIClient().chat.completions.create({
+    const resp = await getOpenAIClient().responses.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      input: [
+        {
+          role: 'developer',
+          content: [
+            { type: 'input_text', text: 'Always call return_training_plan with valid JSON only. Keep notes short and simple. No extra prose.' }
+          ]
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'input_text', text: userPrompt }
+          ]
+        }
+      ],
       tools: [
         {
           type: 'function',
-          function: {
-            name: 'return_training_plan',
-            description: 'Return the finalized training plan as JSON',
-            parameters: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                name: { type: 'string' },
-                description: { type: 'string' },
-                duration_weeks: { type: 'integer', minimum: 1 },
-                weekly_structure: {
-                  type: 'object',
-                  additionalProperties: false,
-                  properties: {
-                    target_sessions_per_week: { type: 'integer', minimum: 1 },
-                    target_weekly_distance: { type: 'number', minimum: 0 },
-                    target_weekly_time_hours: { type: 'number', minimum: 0 }
-                  },
-                  required: ['target_sessions_per_week','target_weekly_distance','target_weekly_time_hours']
-                },
-                phases: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    properties: {
-                      name: { type: 'string' },
-                      weeks: { type: 'array', items: { type: 'integer', minimum: 1 } },
-                      focus: { type: 'string' },
-                      description: { type: 'string' }
-                    },
-                    required: ['name','weeks','focus','description']
-                  }
-                },
-                sessions: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    properties: {
-                      week: { type: 'integer', minimum: 1 },
-                      day_of_week: { type: 'integer', minimum: 1, maximum: 7 },
-                      name: { type: 'string' },
-                      session_type: { type: 'string', enum: ['cardio','strength','recovery','mixed','skill'] },
-                      duration_minutes: { type: 'integer', minimum: 1 },
-                      intensity: { type: 'integer', minimum: 1, maximum: 5 },
-                      description: { type: 'string' },
-                      target_pace: { type: 'string' },
-                      notes: { type: 'string' }
-                    },
-                    required: ['week','day_of_week','name','session_type','duration_minutes','intensity']
-                  }
-                },
-                ai_insights: {
-                  type: 'object',
-                  additionalProperties: false,
-                  properties: {
-                    plan_rationale: { type: 'string' },
-                    progression_strategy: { type: 'string' },
-                    key_adaptations: { type: 'string' },
-                    recovery_emphasis: { type: 'string' }
-                  }
+          description: 'Return a structured training plan for the athlete.',
+          name: 'return_training_plan',
+          parameters: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['athlete','plan_summary','weeks'],
+            properties: {
+              athlete: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['sport','level','goal'],
+                properties: {
+                  sport: { type: 'string', enum: ['cycling','running','climbing'] },
+                  level: { type: 'string', enum: ['beginner','intermediate','advanced'] },
+                  goal: { type: 'string', maxLength: 200 }
                 }
               },
-              required: ['name','description','duration_weeks','weekly_structure','phases','sessions','ai_insights']
+              plan_summary: { type: 'string', maxLength: 500 },
+              weeks: {
+                type: 'array',
+                minItems: 1,
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  required: ['week_number','sessions'],
+                  properties: {
+                    week_number: { type: 'integer', minimum: 1 },
+                    sessions: {
+                      type: 'array',
+                      minItems: 1,
+                      items: {
+                        type: 'object',
+                        additionalProperties: false,
+                        required: ['title','intensity','duration_minutes','notes'],
+                        properties: {
+                          title: { type: 'string', maxLength: 80 },
+                          intensity: { type: 'string', enum: ['Z2','tempo','threshold','VO2','skills','rest'] },
+                          duration_minutes: { type: 'integer', minimum: 10, maximum: 240 },
+                          notes: { type: 'string', maxLength: 240 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
-          }
+          },
+          strict: true
         }
       ],
-      tool_choice: { type: 'function', function: { name: 'return_training_plan' } },
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert endurance coach and exercise physiologist. Create a detailed, personalized training plan and call the function return_training_plan with the final JSON. Do not include code fences or extra prose."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.2,
-      max_tokens: 2500
+      tool_choice: { type: 'function', name: 'return_training_plan' },
+      store: false
     })
 
-    const choice = completion.choices[0]
-    const toolCall = choice?.message?.tool_calls?.[0]
-    if (toolCall?.function?.arguments) {
-      const rawArgs = toolCall.function.arguments
-      try {
-        return JSON.parse(rawArgs)
-      } catch (_) {
-        try {
-          // Sanitize any accidental fences or extra prose
-          let t = rawArgs.trim().replace(/```json\s*/gi, '').replace(/```/g, '').trim()
-          const first = t.indexOf('{')
-          const last = t.lastIndexOf('}')
-          if (first !== -1 && last !== -1 && last > first) {
-            t = t.slice(first, last + 1)
-          }
-          return JSON.parse(t)
-        } catch (e) {
-          console.error('Failed to parse tool arguments:', e)
-        }
+    const first = (resp as any).output?.[0]?.content?.[0]
+    let planData: any | null = null
+    if (first?.type === 'tool_use' && first?.name === 'return_training_plan') {
+      planData = first.input
+    } else if (first?.type === 'output_json') {
+      planData = first.json
+    }
+
+    if (!planData) {
+      return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
+    }
+
+    // Map the returned plan (week 1) to our internal aiPlan shape expected by saveTrainingPlan
+    const week1 = Array.isArray(planData.weeks) ? planData.weeks.find((w: any) => w.week_number === 1) || planData.weeks[0] : null
+    const sessions = Array.isArray(week1?.sessions) ? week1.sessions : []
+
+    const intensityToNumeric: Record<string, number> = {
+      rest: 1,
+      Z2: 2,
+      tempo: 3,
+      threshold: 4,
+      VO2: 5,
+      skills: 2
+    }
+    const intensityToType: Record<string, string> = {
+      rest: 'recovery',
+      Z2: 'cardio',
+      tempo: 'cardio',
+      threshold: 'cardio',
+      VO2: 'cardio',
+      skills: 'skill'
+    }
+
+    const mappedSessions = sessions.map((s: any, idx: number) => ({
+      week: 1,
+      day_of_week: idx + 1,
+      name: s.title,
+      session_type: intensityToType[s.intensity] || 'cardio',
+      duration_minutes: s.duration_minutes,
+      intensity: intensityToNumeric[s.intensity] ?? 2,
+      description: s.notes,
+      target_pace: undefined,
+      notes: s.notes
+    }))
+
+    const totalMinutes = mappedSessions.reduce((sum: number, s: any) => sum + (s.duration_minutes || 0), 0)
+
+    const aiPlan = {
+      name: `${userGoal} – Week 1`,
+      description: planData.plan_summary || 'Week 1 plan',
+      duration_weeks: 1,
+      weekly_structure: {
+        target_sessions_per_week: mappedSessions.length,
+        target_weekly_distance: 0,
+        target_weekly_time_hours: Math.round((totalMinutes / 60) * 10) / 10
+      },
+      phases: [
+        { name: 'Week 1', weeks: [1], focus: 'intro', description: 'Initial week from structured plan' }
+      ],
+      sessions: mappedSessions,
+      ai_insights: {
+        plan_rationale: 'Generated from structured prompt',
+        progression_strategy: 'Week-by-week build',
+        key_adaptations: 'Aerobic fitness and threshold development',
+        recovery_emphasis: 'One rest day'
       }
     }
 
-    // Fallback: attempt to parse content if provided
-    const aiResponse = choice?.message?.content
-    if (aiResponse) {
-      try {
-        return JSON.parse(aiResponse)
-      } catch {}
-    }
-    return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
+    return aiPlan
   }
 
   private buildTrainingPrompt({
