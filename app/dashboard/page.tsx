@@ -5,7 +5,7 @@ import { db } from '@/lib/supabase'
 import { DashboardOverview } from '@/components/dashboard/dashboard-overview'
 import { TrainingCalendar } from '@/components/training/training-calendar'
 import { RecentActivities } from '@/components/strava/recent-activities'
-import { GeneratorPanel } from '@/components/generator-panel'
+import { GeneratorPanelWrapper } from '@/components/dashboard/generator-panel-wrapper'
 import { PageHeader } from '@/components/ui/page-header'
 import { ProgressRing } from '@/components/ui/progress-ring'
 import { StravaConnectButton } from '@/components/strava/connect-button'
@@ -41,7 +41,7 @@ export default async function DashboardPage() {
 
       <DashboardOverview userId={decoded.userId} />
       
-      <GeneratorPanel onGenerate={() => { /* wire to /api/plan or chat */ }} />
+      <GeneratorPanelWrapper />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <TrainingCalendar userId={decoded.userId} />
