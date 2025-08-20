@@ -217,25 +217,94 @@ export class AITrainingGenerator {
 
     const completion = await getOpenAIClient().chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      response_format: { type: 'json_object' },
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'TrainingPlan',
+          strict: true,
+          schema: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              name: { type: 'string' },
+              description: { type: 'string' },
+              duration_weeks: { type: 'integer', minimum: 1 },
+              weekly_structure: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  target_sessions_per_week: { type: 'integer', minimum: 1 },
+                  target_weekly_distance: { type: 'number', minimum: 0 },
+                  target_weekly_time_hours: { type: 'number', minimum: 0 }
+                },
+                required: ['target_sessions_per_week', 'target_weekly_distance', 'target_weekly_time_hours']
+              },
+              phases: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  properties: {
+                    name: { type: 'string' },
+                    weeks: { type: 'array', items: { type: 'integer', minimum: 1 } },
+                    focus: { type: 'string' },
+                    description: { type: 'string' }
+                  },
+                  required: ['name', 'weeks', 'focus']
+                }
+              },
+              sessions: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  properties: {
+                    week: { type: 'integer', minimum: 1 },
+                    day_of_week: { type: 'integer', minimum: 1, maximum: 7 },
+                    name: { type: 'string' },
+                    session_type: { type: 'string', enum: ['cardio','strength','recovery','mixed','skill'] },
+                    duration_minutes: { type: 'integer', minimum: 1 },
+                    intensity: { type: 'integer', minimum: 1, maximum: 5 },
+                    description: { type: 'string' },
+                    target_pace: { type: 'string' },
+                    notes: { type: 'string' }
+                  },
+                  required: ['week','day_of_week','name','session_type','duration_minutes','intensity']
+                }
+              },
+              ai_insights: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  plan_rationale: { type: 'string' },
+                  progression_strategy: { type: 'string' },
+                  key_adaptations: { type: 'string' },
+                  recovery_emphasis: { type: 'string' }
+                }
+              }
+            },
+            required: ['name','description','duration_weeks','weekly_structure','phases','sessions','ai_insights']
+          }
+        }
+      },
       messages: [
         {
           role: "system",
-          content: "You are an expert endurance coach and exercise physiologist. Create detailed, personalized training plans based on the athlete's data and goals. Return ONLY a valid JSON object, with no code fences, no markdown, and no commentary."
+          content: "You are an expert endurance coach and exercise physiologist. Create detailed, personalized training plans based on the athlete's data and goals. Follow the provided JSON schema exactly. Do not include code fences, markdown, or any text outside the JSON object."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.5,
+      temperature: 0.2,
       max_tokens: 2500
     })
 
     const aiResponse = completion.choices[0]?.message?.content
     if (!aiResponse) throw new Error('No response from AI')
 
-    // Always sanitize AI output before parsing
+    // For structured outputs, message content is already valid JSON
     const tryParse = (text: string) => JSON.parse(text)
     const sanitize = (text: string) => {
       let t = text.trim()
@@ -251,8 +320,7 @@ export class AITrainingGenerator {
     }
 
     try {
-      const sanitized = sanitize(aiResponse)
-      return tryParse(sanitized)
+      return tryParse(aiResponse)
     } catch (parseError) {
       console.error('Failed to parse AI response after sanitize:', parseError)
       return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
