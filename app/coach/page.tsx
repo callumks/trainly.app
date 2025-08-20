@@ -1,91 +1,63 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-
-type Session = { title: string; intensity: string; duration_minutes: number; notes: string };
-type Week = { week_number: number; sessions: Session[] };
+import { useRouter } from 'next/navigation'
+import { OnboardingHero } from '@/components/OnboardingHero'
+import { AiThinking } from '@/components/AiThinking'
 
 export default function CoachPage() {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{ role: string; text: string }[]>([]);
-  const [weeks, setWeeks] = useState<Week[]>([]);
-  const evtRef = useRef<EventSource | null>(null);
+  const router = useRouter()
+  const [thinking, setThinking] = useState(false)
+  const [step, setStep] = useState(0)
 
-  function startStream(userText: string) {
-    if (evtRef.current) { evtRef.current.close(); evtRef.current = null; }
-    const es = new EventSource("/api/chat", { withCredentials: true } as any);
-    evtRef.current = es;
-    es.addEventListener("tool.call", (e: MessageEvent) => {
-      const data = JSON.parse(e.data);
-      setMessages((m) => [...m, { role: "tool", text: JSON.stringify(data.args).slice(0, 200) + "…" }]);
-      if (data.args?.weeks) setWeeks(data.args.weeks);
-    });
-    es.addEventListener("plan.full", (e: MessageEvent) => {
-      const data = JSON.parse(e.data);
-      if (data.plan?.weeks) setWeeks(data.plan.weeks);
-    });
-    es.addEventListener("done", () => { es.close(); evtRef.current = null; });
-    es.addEventListener("error", () => { es.close(); evtRef.current = null; });
+  async function handleSubmit(prompt: string) {
+    setThinking(true)
+    setStep(0)
+    const steps = ["Analyzing Strava…","Balancing load…","Building hybrid week…"]
+    const timer = setInterval(()=>setStep((i)=> (i+1)%steps.length), 900)
+    try {
+      // Call chat to generate a draft plan; in this stub we simulate client-side and persist via /api/plan
+      const draft = buildDraftPlan()
+      await fetch('/api/plan', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ plan: draft }) })
+      router.push('/dashboard')
+    } finally {
+      clearInterval(timer)
+      setThinking(false)
+    }
   }
 
-  async function send() {
-    const text = input.trim();
-    if (!text) return;
-    setMessages((m) => [...m, { role: "user", text }]);
-    setInput("");
-    await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-    startStream(text);
+  function buildDraftPlan() {
+    const now = new Date()
+    const monday = new Date(now)
+    const day = monday.getDay()
+    const diff = (day === 0 ? -6 : 1 - day)
+    monday.setDate(monday.getDate() + diff)
+    const iso = (d: Date) => d.toISOString().slice(0,10)
+    const sessions = [
+      { id: 's1', date: iso(monday), sport: 'cycling', title: 'Z2 Endurance Ride', status: 'planned' },
+      { id: 's2', date: iso(new Date(monday.getTime()+1*86400000)), sport: 'climbing', title: 'Bouldering Power', status: 'planned' },
+      { id: 's3', date: iso(new Date(monday.getTime()+3*86400000)), sport: 'cycling', title: 'Threshold Intervals', status: 'planned' },
+      { id: 's4', date: iso(new Date(monday.getTime()+5*86400000)), sport: 'climbing', title: 'Technique + Volume', status: 'planned' },
+    ] as any
+    return {
+      id: 'plan-1',
+      userId: 'u1',
+      weekStart: iso(monday),
+      weeks: [{ start: iso(monday), sessions }],
+      meta: { generatedAt: new Date().toISOString(), sources: ['user_input'], version: 1, goals: [] }
+    }
   }
-
-  useEffect(() => () => { if (evtRef.current) evtRef.current.close(); }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-      <div className="space-y-4">
-        <h1 className="text-2xl font-semibold">Coach</h1>
-        <div className="border rounded p-3 h-[60vh] overflow-auto space-y-2">
-          {messages.map((m, i) => (
-            <div key={i} className="text-sm"><b>{m.role}:</b> {m.text}</div>
-          ))}
+    <div className="p-6">
+      {!thinking ? (
+        <OnboardingHero onSubmit={handleSubmit} />
+      ) : (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
+          <div className="text-2xl font-semibold">Generating your plan…</div>
+          <AiThinking steps={["Analyzing Strava…","Balancing load…","Building hybrid week…"]} activeIndex={step} />
         </div>
-        <div className="flex gap-2">
-          <input className="flex-1 border rounded px-3 py-2" value={input} onChange={(e)=>setInput(e.target.value)} placeholder="Tell the coach how you feel…" />
-          <button onClick={send} className="px-4 py-2 bg-black text-white rounded">Send</button>
-        </div>
-        <div className="flex gap-2 text-sm">
-          {[
-            "Feeling fatigued",
-            "Injury note",
-            "Shorten long ride",
-          ].map((t) => (
-            <button key={t} onClick={() => setInput(t)} className="px-2 py-1 border rounded">{t}</button>
-          ))}
-        </div>
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Current Week</h2>
-        {weeks.length === 0 && <div className="text-sm text-gray-500">No plan yet. Ask the coach to generate week 1.</div>}
-        {weeks.map((w) => (
-          <div key={w.week_number} className="space-y-2">
-            <h3 className="font-medium">Week {w.week_number}</h3>
-            <div className="grid gap-3">
-              {w.sessions.map((s, i) => (
-                <div key={i} className="p-3 border rounded">
-                  <div className="flex justify-between">
-                    <div className="font-medium">{s.title}</div>
-                    <div className="text-sm opacity-70">{s.intensity} • {s.duration_minutes}m</div>
-                  </div>
-                  <div className="text-sm mt-1">{s.notes}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      )}
     </div>
-  );
+  )
 }
 

@@ -3,7 +3,7 @@ import { getOpenAI } from "@/lib/openai";
 import { trainingPlanTool } from "@/lib/schemas/trainingPlan";
 import { db } from "@/lib/supabase";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 async function requireAuth(req: NextRequest): Promise<string> {
   const token = req.headers.get("cookie") || "";
