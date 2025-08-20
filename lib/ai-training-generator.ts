@@ -254,9 +254,12 @@ export class AITrainingGenerator {
       return tryParse(aiResponse)
     } catch (_) {
       try {
-        return tryParse(sanitize(aiResponse))
+        const sanitized = sanitize(aiResponse)
+        return tryParse(sanitized)
       } catch (parseError) {
         console.error('Failed to parse AI response:', parseError)
+        console.error('AI raw head:', aiResponse.slice(0, 200))
+        console.error('AI sanitized head:', sanitize(aiResponse).slice(0, 200))
         return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
       }
     }
