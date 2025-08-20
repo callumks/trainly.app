@@ -21,6 +21,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: BarChart3 },
   { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
+  { name: 'Coach', href: '/dashboard/coach', icon: Target },
   { name: 'Training Plans', href: '/dashboard/plans', icon: Target },
   { name: 'Activities', href: '/dashboard/activities', icon: Activity },
   { name: 'Nutrition', href: '/dashboard/nutrition', icon: Utensils },
