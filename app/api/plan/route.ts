@@ -20,13 +20,13 @@ export async function POST(req: NextRequest) {
         profile ? { role: "assistant", content: `PROFILE: ${JSON.stringify(profile)}` } : undefined,
         { role: "user", content: message }
       ].filter(Boolean) as any,
-      tools: [trainingPlanTool],
-      tool_choice: { type: "function", function: { name: "return_training_plan" } }
+      tools: [trainingPlanTool as any],
+      tool_choice: { type: "function", name: "return_training_plan" } as any
     });
 
     const blocks = (response.output?.[0]?.content ?? []) as any[];
-    const call = blocks.find((b) => b.type === "tool_call");
-    const argsStr: string | undefined = call?.function?.arguments;
+    const call = blocks.find((b) => b.type === "tool_use" || b.type === "tool_call");
+    const argsStr: string | undefined = call?.input ? JSON.stringify(call.input) : call?.function?.arguments;
 
     if (!argsStr) {
       return NextResponse.json({ error: "No tool_call returned" }, { status: 502 });

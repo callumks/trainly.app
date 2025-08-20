@@ -1,9 +1,8 @@
 export const trainingPlanTool = {
   type: "function",
-  function: {
-    name: "return_training_plan",
-    description: "Return a structured training plan for the athlete.",
-    parameters: {
+  name: "return_training_plan",
+  description: "Return a structured training plan for the athlete.",
+  parameters: {
       type: "object",
       additionalProperties: false,
       required: ["athlete", "plan_summary", "weeks"],
@@ -47,9 +46,8 @@ export const trainingPlanTool = {
           }
         }
       }
-    },
-    strict: true
-  }
+  },
+  strict: true
 } as const;
 
 export type TrainingPlan = {
