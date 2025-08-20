@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation'
-import { OnboardingHero } from '@/components/OnboardingHero'
+import { OnboardingLanding } from '@/components/coach/OnboardingLanding'
 import { AiThinking } from '@/components/AiThinking'
 
 export default function CoachPage() {
@@ -48,9 +48,9 @@ export default function CoachPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="">
       {!thinking ? (
-        <OnboardingHero onSubmit={handleSubmit} />
+        <OnboardingLanding onSubmit={handleSubmit} />
       ) : (
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
           <div className="text-2xl font-semibold">Generating your plan…</div>
