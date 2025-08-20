@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation'
 import { OnboardingLanding } from '@/components/coach/OnboardingLanding'
 import { AiThinking } from '@/components/AiThinking'
-import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CoachPage() {
   const router = useRouter()
@@ -50,18 +49,14 @@ export default function CoachPage() {
 
   return (
     <div className="">
-      <AnimatePresence initial={false} mode="wait">
-        {!thinking ? (
-          <motion.div key="landing" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
-            <OnboardingLanding onSubmit={handleSubmit} />
-          </motion.div>
-        ) : (
-          <motion.div key="thinking" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
-            <div className="text-2xl font-semibold">Generating your plan…</div>
-            <AiThinking steps={["Analyzing Strava…","Balancing load…","Building hybrid week…"]} activeIndex={step} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {!thinking ? (
+        <OnboardingLanding onSubmit={handleSubmit} />
+      ) : (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
+          <div className="text-2xl font-semibold">Generating your plan…</div>
+          <AiThinking steps={["Analyzing Strava…","Balancing load…","Building hybrid week…"]} activeIndex={step} />
+        </div>
+      )}
     </div>
   )
 }
