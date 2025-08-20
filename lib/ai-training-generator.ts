@@ -235,12 +235,30 @@ export class AITrainingGenerator {
     const aiResponse = completion.choices[0]?.message?.content
     if (!aiResponse) throw new Error('No response from AI')
 
+    // Try strict JSON parse, then sanitize and retry once before falling back
+    const tryParse = (text: string) => JSON.parse(text)
+    const sanitize = (text: string) => {
+      let t = text.trim()
+      // remove code fences
+      t = t.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim()
+      // extract first {...} block if extra prose exists
+      const first = t.indexOf('{')
+      const last = t.lastIndexOf('}')
+      if (first !== -1 && last !== -1 && last > first) {
+        t = t.slice(first, last + 1)
+      }
+      return t
+    }
+
     try {
-      return JSON.parse(aiResponse)
-    } catch (parseError) {
-      // If JSON parsing fails, create a fallback plan
-      console.error('Failed to parse AI response:', parseError)
-      return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
+      return tryParse(aiResponse)
+    } catch (_) {
+      try {
+        return tryParse(sanitize(aiResponse))
+      } catch (parseError) {
+        console.error('Failed to parse AI response:', parseError)
+        return this.createFallbackPlan(profile, fitnessAnalysis, planDuration)
+      }
     }
   }
 
