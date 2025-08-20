@@ -28,7 +28,8 @@ export function diffPlan(prev: Plan, next: Plan): PlanDiff {
   for (const w of next.weeks) for (const s of w.sessions) nextSessions.set(s.id, { weekStart: w.start, session: s })
 
   // additions and updates
-  for (const [id, { weekStart, session }] of nextSessions) {
+  for (const [id, entry] of Array.from(nextSessions.entries())) {
+    const { weekStart, session } = entry
     const prevEntry = prevSessions.get(id)
     if (!prevEntry) {
       changes.push({ type: 'add-session', weekStart, session })
@@ -47,7 +48,7 @@ export function diffPlan(prev: Plan, next: Plan): PlanDiff {
   }
 
   // removals
-  for (const id of prevSessions.keys()) {
+  for (const id of Array.from(prevSessions.keys())) {
     if (!nextSessions.has(id)) changes.push({ type: 'remove-session', sessionId: id })
   }
 
