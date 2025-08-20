@@ -1,11 +1,25 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Activity, Loader2 } from 'lucide-react'
+import { Activity, Loader2, CheckCircle2 } from 'lucide-react'
 
 export function StravaConnectButton() {
   const [loading, setLoading] = useState(false)
+  const [connected, setConnected] = useState(false)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/profile', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        const has = !!(data?.profile?.strava_id)
+        setConnected(has)
+      } catch {}
+    }
+    load()
+  }, [])
 
   const onConnect = async () => {
     try {
@@ -22,6 +36,14 @@ export function StravaConnectButton() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (connected) {
+    return (
+      <Button disabled className="bg-emerald-600 hover:bg-emerald-600 text-white">
+        <CheckCircle2 className="mr-2 h-4 w-4" /> Strava connected
+      </Button>
+    )
   }
 
   return (
