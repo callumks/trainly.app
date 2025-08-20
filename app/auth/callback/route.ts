@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         [stravaId, tokens.access_token, tokens.refresh_token, userId]
       )
 
-      const dest = state === 'signup' ? '/onboarding' : '/dashboard'
+      const dest = state === 'signup' ? '/onboarding' : state === 'coach' ? '/coach' : '/dashboard'
       return NextResponse.redirect(new URL(`${dest}?strava=linked`, origin))
     } catch (e) {
       return NextResponse.redirect(new URL('/dashboard?strava=link_failed', origin))
@@ -61,6 +61,6 @@ export async function GET(request: NextRequest) {
   }
 
   // Fallback redirect
-  const destination = state === 'signup' ? '/onboarding' : '/dashboard'
+  const destination = state === 'signup' ? '/onboarding' : state === 'coach' ? '/coach' : '/dashboard'
   return NextResponse.redirect(new URL(destination, origin))
 }
