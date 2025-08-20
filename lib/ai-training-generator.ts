@@ -221,7 +221,6 @@ export class AITrainingGenerator {
         type: 'json_schema',
         json_schema: {
           name: 'TrainingPlan',
-          strict: true,
           schema: {
             type: 'object',
             additionalProperties: false,
@@ -250,7 +249,7 @@ export class AITrainingGenerator {
                     focus: { type: 'string' },
                     description: { type: 'string' }
                   },
-                  required: ['name', 'weeks', 'focus']
+                  required: ['name', 'weeks', 'focus', 'description']
                 }
               },
               sessions: {
