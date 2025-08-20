@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { getOpenAI } from "@/lib/openai";
 import { trainingPlanTool } from "@/lib/schemas/trainingPlan";
-import { db } from "@/lib/supabase";
 
 export const runtime = "edge";
 
@@ -25,11 +24,7 @@ export async function POST(req: NextRequest) {
       };
 
       try {
-        // Persist user message (minimal)
-        await db.query(
-          'insert into chat_messages (thread_id, user_id, role, content) values ($1,$2,$3,$4)',
-          [threadId, userId, 'user', JSON.stringify({ text: message })]
-        );
+        // Note: avoid DB access in Edge runtime; persist via a Node route if needed
 
         const oai = getOpenAI();
         const resp = await oai.responses.create({
