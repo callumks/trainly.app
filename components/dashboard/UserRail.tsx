@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { Card } from '@/components/ui/card'
+import { RecentActivities } from '@/components/strava/recent-activities'
 
 const SPORTS = ['Cycling','Climbing','Running','Strength']
 
@@ -40,6 +41,7 @@ export function UserRail({ profile }: { profile: any }) {
           ))}
         </div>
       </Card>
+      <RecentActivities userId={profile?.id || ''} />
     </div>
   )
 }
