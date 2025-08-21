@@ -29,14 +29,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
       <div className="mx-auto max-w-[1220px] px-4 pb-20 pt-6">
-        <header className="mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs text-zinc-400">
-            <Sparkles className="h-3.5 w-3.5 text-zinc-300" />
-            Dashboard
-          </div>
-          <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight text-zinc-100">Your hybrid plan</h1>
-          <p className="mt-2 text-zinc-400">This week’s plan, live metrics, and coach updates.</p>
-        </header>
+        {/* Header texts removed per design feedback */}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left rail */}
