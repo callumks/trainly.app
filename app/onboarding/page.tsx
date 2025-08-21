@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { db } from '@/lib/supabase'
 import { OnboardingLanding } from '@/components/coach/OnboardingLanding'
-import { AiThinking } from '@/components/AiThinking'
+import MinimalTopbar from '@/components/nav/MinimalTopbar'
 
 export default async function OnboardingPage() {
   const token = cookies().get('auth-token')?.value
@@ -26,8 +26,11 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="px-4 py-10">
-      <OnboardingLanding onSubmit={() => {}} />
+    <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
+      <MinimalTopbar />
+      <div className="px-4 py-10">
+        <OnboardingLanding onSubmit={() => {}} />
+      </div>
     </div>
   )
 } 

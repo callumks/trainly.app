@@ -16,6 +16,7 @@ const navItems = [
   { label: 'Coach', href: '/coach' },
   { label: 'Insights', href: '/insights' },
   { label: 'Goals', href: '/goals' },
+  { label: 'Profile', href: '/profile' },
   { label: 'Settings', href: '/settings' },
 ]
 
