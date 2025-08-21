@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getOpenAI } from "@/lib/openai";
 import { trainingPlanTool } from "@/lib/schemas/trainingPlan";
+import { applyDraftPlan } from "@/lib/plans";
 
 export const runtime = "edge";
 
@@ -46,8 +47,12 @@ export async function POST(req: NextRequest) {
         if (tool) {
           if (tool.type === 'tool_use') {
             send('tool.call', { name: tool.name, args: tool.input });
-            // TODO: upsert into plans and compute diff
-            send('plan.full', { plan: { weeks: tool.input?.weeks || [] } });
+            try {
+              const diff = await applyDraftPlan(tool.input as any)
+              send('plan.diff', { diff })
+            } catch (e:any) {
+              send('error', { message: e?.message || 'applyDraftPlan failed' })
+            }
           } else {
             send('tool.call', { name: tool.function?.name, args: JSON.parse(tool.function?.arguments || '{}') });
           }

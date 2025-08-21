@@ -1,5 +1,6 @@
 import { db } from '@/lib/supabase'
 import { Plan, PlanDiff, Session } from '@/lib/types'
+import { publishPlanUpdated } from '@/lib/realtime'
 
 export async function readActivePlan(userId: string): Promise<Plan | null> {
   const res = await db.query('select metadata from training_plans where user_id=$1 and is_active=true order by updated_at desc limit 1', [userId])
@@ -16,6 +17,8 @@ export async function writePlan(userId: string, plan: Plan): Promise<void> {
      values ($1,$2,$3,true,'ai_generated',$4)`,
     [userId, 'Hybrid plan', plan.weekStart, { plan }]
   )
+  // Broadcast simple event (no diff here; actions will publish with diffs)
+  publishPlanUpdated(userId, { versionTo: plan.meta.version })
 }
 
 export function diffPlan(prev: Plan, next: Plan): PlanDiff {

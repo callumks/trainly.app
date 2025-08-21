@@ -2,11 +2,35 @@ import React from 'react'
 import { Card } from '@/components/ui/card'
 import { NutritionPanel } from '@/components/NutritionPanel'
 import { ActivitySyncBanner } from '@/components/ActivitySyncBanner'
+import { useEffect, useState } from 'react'
+import { subscribePlanUpdated } from '@/lib/realtime'
 
 export function RightRail({ plan }: { plan: any }) {
+  const [updates, setUpdates] = useState<any[]>([])
+  useEffect(()=>{
+    const userId = plan?.userId || ''
+    if (!userId) return
+    const off = subscribePlanUpdated(userId, (p)=>{
+      setUpdates((u)=> [p, ...u].slice(0,3))
+    })
+    return off
+  },[plan?.userId])
+
   return (
     <div className="space-y-4">
-      <ActivitySyncBanner hasNew={false} />
+      <ActivitySyncBanner hasNew={updates.length>0} />
+      <Card className="p-4 border-neutral-800 bg-neutral-950/60">
+        <div className="text-sm font-medium mb-2">Plan updates</div>
+        <ul className="text-sm text-zinc-300 space-y-1">
+          {updates.length === 0 ? <li>No changes yet</li> : updates.map((u,i)=>(
+            <li key={i}>v{u.versionFrom} → v{u.versionTo} · {u.diff?.length || 0} changes</li>
+          ))}
+        </ul>
+        <div className="mt-3 flex gap-2">
+          <button className="px-3 py-1 rounded-md border border-neutral-800 text-sm">Accept all</button>
+          <button className="px-3 py-1 rounded-md border border-neutral-800 text-sm">Revert</button>
+        </div>
+      </Card>
       <NutritionPanel enabled={!!plan?.weeks?.[0]?.nutrition?.enabled} />
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
         <div className="text-sm font-medium mb-2">Upcoming goals</div>
