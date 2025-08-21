@@ -42,11 +42,7 @@ export function RightRail({ plan }: { plan: any }) {
       <NutritionPanel enabled={!!plan?.weeks?.[0]?.nutrition?.enabled} />
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
         <div className="text-sm font-medium mb-2">Readiness</div>
-        <ul className="text-sm text-zinc-300 space-y-1">
-          <li>Sleep: —</li>
-          <li>HRV: —</li>
-          <li>Strain: —</li>
-        </ul>
+        <ReadinessCard />
       </Card>
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
         <div className="text-sm font-medium mb-2">Upcoming goals</div>
@@ -57,6 +53,22 @@ export function RightRail({ plan }: { plan: any }) {
           {(!plan?.meta?.goals || plan.meta.goals.length === 0) && <li>No goals set</li>}
         </ul>
       </Card>
+    </div>
+  )
+}
+
+function ReadinessCard() {
+  const [data, setData] = React.useState<{ score: number; ratio: number; flag: string } | null>(null)
+  React.useEffect(()=>{
+    let cancelled = false
+    fetch('/api/readiness', { cache: 'no-store' }).then(r=>r.json()).then(j=>{ if(!cancelled) setData(j) }).catch(()=>{})
+    return ()=>{ cancelled = true }
+  },[])
+  if (!data) return <div className="text-sm text-zinc-400">Loading…</div>
+  return (
+    <div className="text-sm text-zinc-300">
+      <div className="text-2xl font-semibold mb-1">{data.score}</div>
+      <div className="text-xs text-zinc-500">AC ratio {data.ratio} · {data.flag}</div>
     </div>
   )
 }

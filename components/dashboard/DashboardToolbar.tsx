@@ -1,9 +1,13 @@
 'use client'
 import React, { useState } from 'react'
 import { Bike, Mountain, Dumbbell, Footprints, ChevronDown } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export function DashboardToolbar() {
-  const [weekOffset, setWeekOffset] = useState(0)
+  const router = useRouter()
+  const params = useSearchParams()
+  const initial = Number(params.get('weekOffset') || '0')
+  const [weekOffset, setWeekOffset] = useState(initial)
   const label = weekOffset === 0 ? 'This week' : weekOffset === -1 ? 'Last week' : weekOffset === 1 ? 'Next week' : `${weekOffset>0?'+':''}${weekOffset} weeks`
   return (
     <div className="flex items-center justify-between">
@@ -14,11 +18,11 @@ export function DashboardToolbar() {
         <button className="h-9 w-9 inline-flex items-center justify-center rounded-md border border-neutral-800 hover:bg-neutral-900"><Dumbbell className="h-4 w-4" /></button>
       </div>
       <div className="flex items-center gap-2">
-        <button onClick={()=>setWeekOffset(o=>o-1)} className="rounded-md border border-neutral-800 px-2 py-1 text-sm text-zinc-200 hover:bg-neutral-900">←</button>
+        <button onClick={()=>{ const next=weekOffset-1; setWeekOffset(next); router.push(`?weekOffset=${next}`)}} className="rounded-md border border-neutral-800 px-2 py-1 text-sm text-zinc-200 hover:bg-neutral-900">←</button>
         <button className="inline-flex items-center gap-2 rounded-md border border-neutral-800 px-3 py-2 text-sm text-zinc-200 hover:bg-neutral-900">
           {label} <ChevronDown className="h-4 w-4" />
         </button>
-        <button onClick={()=>setWeekOffset(o=>o+1)} className="rounded-md border border-neutral-800 px-2 py-1 text-sm text-zinc-200 hover:bg-neutral-900">→</button>
+        <button onClick={()=>{ const next=weekOffset+1; setWeekOffset(next); router.push(`?weekOffset=${next}`)}} className="rounded-md border border-neutral-800 px-2 py-1 text-sm text-zinc-200 hover:bg-neutral-900">→</button>
       </div>
     </div>
   )

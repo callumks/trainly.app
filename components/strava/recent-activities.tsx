@@ -148,7 +148,7 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
       <CardHeader>
         <CardTitle>Recent Activities</CardTitle>
         <CardDescription>Your latest Strava activities</CardDescription>
-        <div className="mt-2">
+        <div className="mt-2 flex items-center gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -170,6 +170,31 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
             disabled={syncing}
           >
             {syncing ? 'Syncing…' : 'Sync now'}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={async () => {
+              const name = prompt('Activity name (e.g., Easy Ride 60m)') || ''
+              const sport = prompt('Sport (Ride/Run/Climb)') || 'Ride'
+              const start_date = new Date().toISOString()
+              const moving_time_s = Number(prompt('Duration (minutes)') || '60') * 60
+              try {
+                const res = await fetch('/api/activities/manual', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ sport, name, start_date, moving_time_s })
+                })
+                const j = await res.json()
+                if (!res.ok) throw new Error(j.error || 'Failed')
+                toast.success('Added manual activity')
+                window.location.reload()
+              } catch (e: any) {
+                toast.error(e?.message || 'Failed')
+              }
+            }}
+          >
+            Add manual
           </Button>
         </div>
       </CardHeader>
