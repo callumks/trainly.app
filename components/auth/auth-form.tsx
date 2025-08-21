@@ -60,8 +60,12 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
         // You might want to redirect to login or auto-sign them in
       } else {
         toast.success('Welcome back!')
-        router.replace('/dashboard')
-        router.refresh()
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard'
+        } else {
+          router.replace('/dashboard')
+          router.refresh()
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'An error occurred')
