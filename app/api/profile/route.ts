@@ -23,3 +23,20 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function POST(request: NextRequest) {
+  try {
+    const token = cookies().get('auth-token')?.value
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
+    const { userId } = jwt.verify(token, secret) as { userId: string }
+
+    const body = await request.formData()
+    const full_name = String(body.get('full_name') || '')
+    const avatar_url = String(body.get('avatar_url') || '')
+    await db.query('update profiles set full_name=$1, avatar_url=$2 where id=$3',[full_name || null, avatar_url || null, userId])
+    return NextResponse.redirect(new URL('/profile', request.url))
+  } catch (e:any) {
+    return NextResponse.json({ error: e?.message || 'Failed' }, { status: 500 })
+  }
+}
+
