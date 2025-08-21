@@ -6,10 +6,12 @@ import { StravaConnectButton } from '@/components/strava/connect-button'
 import { readActivePlan } from '@/lib/plan'
 import { KpiCards } from '@/components/KpiCards'
 import { PlanWeek } from '@/components/PlanWeek'
-import { NutritionPanel } from '@/components/NutritionPanel'
 import { CoachChatDock } from '@/components/CoachChat'
 import { ActivitySyncBanner } from '@/components/ActivitySyncBanner'
 import { Sparkles } from 'lucide-react'
+import { UserRail } from '@/components/dashboard/UserRail'
+import { RightRail } from '@/components/dashboard/RightRail'
+import { BottomNav } from '@/components/nav/BottomNav'
 
 export default async function DashboardPage() {
   const token = cookies().get('auth-token')?.value
@@ -35,9 +37,14 @@ export default async function DashboardPage() {
           <p className="mt-2 text-zinc-400">This week’s plan, live metrics, and coach updates.</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          {/* Main column */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left rail */}
+          <div className="hidden lg:block lg:col-span-3">
+            <UserRail profile={profile} />
+          </div>
+
+          {/* Center column */}
+          <div className="lg:col-span-6 space-y-6">
             <KpiCards ftp={250} volumeMin={420} rpeTrend="flat" compliance={0.86} />
             {plan ? (
               <div className="space-y-4">
@@ -51,18 +58,13 @@ export default async function DashboardPage() {
           </div>
 
           {/* Right rail */}
-          <div className="space-y-4">
-            <ActivitySyncBanner hasNew={false} />
-            <NutritionPanel enabled={!!plan?.weeks?.[0]?.nutrition?.enabled} />
-            {!profile?.strava_id && (
-              <div>
-                <StravaConnectButton />
-              </div>
-            )}
+          <div className="lg:col-span-3">
+            <RightRail plan={plan} />
           </div>
         </div>
 
         <CoachChatDock />
+        <BottomNav />
       </div>
     </div>
   )
