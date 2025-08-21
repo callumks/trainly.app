@@ -1,4 +1,5 @@
 import React from 'react'
+import { ReadinessCard } from '@/components/dashboard/ReadinessCard'
 import { Card } from '@/components/ui/card'
 import { NutritionPanel } from '@/components/NutritionPanel'
 import { ActivitySyncBanner } from '@/components/ActivitySyncBanner'
@@ -57,19 +58,5 @@ export function RightRail({ plan }: { plan: any }) {
   )
 }
 
-function ReadinessCard() {
-  const [data, setData] = React.useState<{ score: number; ratio: number; flag: string } | null>(null)
-  React.useEffect(()=>{
-    let cancelled = false
-    fetch('/api/readiness', { cache: 'no-store' }).then(r=>r.json()).then(j=>{ if(!cancelled) setData(j) }).catch(()=>{})
-    return ()=>{ cancelled = true }
-  },[])
-  if (!data) return <div className="text-sm text-zinc-400">Loading…</div>
-  return (
-    <div className="text-sm text-zinc-300">
-      <div className="text-2xl font-semibold mb-1">{data.score}</div>
-      <div className="text-xs text-zinc-500">AC ratio {data.ratio} · {data.flag}</div>
-    </div>
-  )
-}
+ 
 
