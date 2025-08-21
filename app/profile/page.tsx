@@ -35,9 +35,15 @@ export default async function ProfilePage() {
                 <label className="block mb-1">Name</label>
                 <input name="full_name" defaultValue={profile?.full_name || ''} className="w-full rounded-md border border-neutral-800 bg-black px-3 py-2 text-sm text-zinc-100" />
               </div>
-              <div className="text-sm text-zinc-300">
-                <label className="block mb-1">Profile picture URL</label>
-                <input name="avatar_url" defaultValue={profile?.avatar_url || ''} className="w-full rounded-md border border-neutral-800 bg-black px-3 py-2 text-sm text-zinc-100" />
+              <div className="text-sm text-zinc-300 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block mb-1">Profile picture URL</label>
+                  <input name="avatar_url" defaultValue={profile?.avatar_url || ''} className="w-full rounded-md border border-neutral-800 bg-black px-3 py-2 text-sm text-zinc-100" />
+                </div>
+                <div>
+                  <label className="block mb-1">Or upload file</label>
+                  <input type="file" name="avatar_file" accept="image/*" className="w-full text-sm" />
+                </div>
               </div>
               <button className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white">Save</button>
             </form>

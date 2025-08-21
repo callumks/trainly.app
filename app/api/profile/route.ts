@@ -33,7 +33,18 @@ export async function POST(request: NextRequest) {
     const body = await request.formData()
     const full_name = String(body.get('full_name') || '')
     const avatar_url = String(body.get('avatar_url') || '')
-    await db.query('update profiles set full_name=$1, avatar_url=$2 where id=$3',[full_name || null, avatar_url || null, userId])
+    const avatar_file = body.get('avatar_file') as File | null
+    let avatar_bytes: Buffer | null = null
+    let avatar_mime: string | null = null
+    if (avatar_file && typeof avatar_file.arrayBuffer === 'function') {
+      const ab = await avatar_file.arrayBuffer()
+      avatar_bytes = Buffer.from(ab)
+      avatar_mime = avatar_file.type || 'application/octet-stream'
+    }
+    await db.query(
+      'update profiles set full_name=$1, avatar_url=$2, avatar_bytes=COALESCE($3, avatar_bytes), avatar_mime=COALESCE($4, avatar_mime) where id=$5',
+      [full_name || null, avatar_url || null, avatar_bytes, avatar_mime, userId]
+    )
     return NextResponse.redirect(new URL('/profile', request.url))
   } catch (e:any) {
     return NextResponse.json({ error: e?.message || 'Failed' }, { status: 500 })

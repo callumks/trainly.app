@@ -13,7 +13,7 @@ const SPORTS = ['Cycling', 'Climbing', 'Running', 'Strength']
 const TIME = ['3d/wk', '4d/wk', '5d/wk', '6d/wk']
 const GOALS = ['Upgrade race category', 'Increase FTP', 'Project V‑grade', 'Balanced hybrid']
 
-export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (text: string) => void; stravaConnected?: boolean }) {
+export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit?: (text: string) => void; stravaConnected?: boolean }) {
   const [text, setText] = useState('')
   const [copied, setCopied] = useState(false)
   const [chips, setChips] = useState<string[]>([])
@@ -62,7 +62,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
                 value={text}
                 onChange={(e)=>setText(e.target.value)}
                 placeholder="Paste the example or describe your sports, goals, schedule, injuries. Enter to send, Shift+Enter for newline."
-                onKeyDown={(e)=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); onSubmit(buildPrompt()) } }}
+                onKeyDown={(e)=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); if(onSubmit){ onSubmit(buildPrompt()) } else { window.location.href = `/coach?seed=${encodeURIComponent(buildPrompt())}` } } }}
                 className="bg-neutral-950 border-neutral-800 focus-visible:ring-zinc-700"
               />
 
@@ -72,7 +72,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit: (te
                   <Button variant="secondary" onClick={()=>{ setText(SEED); navigator.clipboard.writeText(SEED); setCopied(true); setTimeout(()=>setCopied(false), 1200) }}>
                     {copied ? <Check className="mr-2 h-4 w-4" /> : <Clipboard className="mr-2 h-4 w-4" />} Use example
                   </Button>
-                  <Button onClick={()=> onSubmit(buildPrompt())}>
+                  <Button onClick={()=> { if(onSubmit){ onSubmit(buildPrompt()) } else { window.location.href = `/coach?seed=${encodeURIComponent(buildPrompt())}` } }}>
                     <Sparkles className="mr-2 h-4 w-4" /> Generate plan
                   </Button>
                 </div>

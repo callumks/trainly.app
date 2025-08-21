@@ -87,7 +87,9 @@ export default function TopNav() {
           <div className="flex items-center gap-2 text-zinc-300">
             <button className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-800 hover:bg-neutral-900"><Search className="h-4 w-4" /></button>
             <button className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-800 hover:bg-neutral-900"><Bell className="h-4 w-4" /></button>
-            <button className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-800 hover:bg-neutral-900"><Plus className="h-4 w-4" /></button>
+            <Link href="/onboarding" className="inline-flex items-center gap-2 rounded-md border border-neutral-800 px-3 py-2 text-sm hover:bg-neutral-900">
+              <Plus className="h-4 w-4" /> New plan
+            </Link>
             <button className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-neutral-800"><User className="h-4 w-4" /></button>
           </div>
         </div>

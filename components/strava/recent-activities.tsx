@@ -86,6 +86,17 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
     return <Activity className="h-4 w-4" />
   }
 
+  const formatType = (type: string) => {
+    if (!type) return ''
+    const map: Record<string,string> = {
+      RockClimbing: 'Climb',
+      Ride: 'Ride',
+      Run: 'Run',
+      Walk: 'Walk',
+    }
+    return map[type] || type
+  }
+
   if (loading) {
     return (
       <Card>
@@ -176,11 +187,11 @@ export function RecentActivities({ userId }: RecentActivitiesProps) {
               >
                 <div className="flex items-center space-x-3">
                   {getActivityIcon(activity.type)}
-                  <div>
-                    <p className="font-medium">{activity.name}</p>
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate max-w-[48vw] md:max-w-[32vw]">{activity.name}</p>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
                       <Badge variant="outline" className="text-xs">
-                        {activity.type}
+                        {formatType(activity.type)}
                       </Badge>
                       {activity.distance && (
                         <>
