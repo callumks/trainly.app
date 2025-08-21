@@ -1,10 +1,21 @@
 import React from 'react'
+import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
+import { redirect } from 'next/navigation'
 import { AuthForm } from '@/components/auth/auth-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default function LoginPage() {
+  const token = cookies().get('auth-token')?.value
+  if (token) {
+    try {
+      const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
+      jwt.verify(token, secret)
+      redirect('/dashboard')
+    } catch {}
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <div className="w-full max-w-md">

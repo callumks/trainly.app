@@ -46,6 +46,7 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        credentials: 'include',
       })
 
       const result = await response.json()
@@ -59,7 +60,8 @@ export function AuthForm({ isSignUp = false }: AuthFormProps) {
         // You might want to redirect to login or auto-sign them in
       } else {
         toast.success('Welcome back!')
-        router.push('/dashboard')
+        router.replace('/dashboard')
+        router.refresh()
       }
     } catch (error: any) {
       toast.error(error.message || 'An error occurred')
