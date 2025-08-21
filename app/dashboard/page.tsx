@@ -43,7 +43,7 @@ export default async function DashboardPage() {
           {/* Center column */}
           <div className="lg:col-span-6 space-y-6">
             <DashboardToolbar />
-            <KpiCards ftp={250} volumeMin={420} rpeTrend="flat" compliance={0.86} />
+            <KpiCards />
             {plan ? (
               <div className="space-y-4">
                 {plan.weeks.map((w: any)=> (
