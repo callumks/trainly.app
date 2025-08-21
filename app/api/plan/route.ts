@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Plan } from "@/lib/types";
 import { readActivePlan, writePlan } from "@/lib/plan";
+import { revalidateTag } from 'next/cache'
 
 export const runtime = 'nodejs'
 
@@ -22,6 +23,8 @@ export async function POST(req: NextRequest) {
     const plan = body?.plan as Plan
     if (!plan) return NextResponse.json({ error: 'plan is required' }, { status: 400 })
     await writePlan(userId, plan)
+    revalidateTag('plan')
+    revalidateTag('overview')
     return NextResponse.json({ ok: true })
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? 'Server error' }, { status: 500 })
@@ -35,6 +38,8 @@ export async function PATCH(req: NextRequest) {
     const plan = body?.plan as Plan
     if (!plan) return NextResponse.json({ error: 'plan is required' }, { status: 400 })
     await writePlan(userId, plan)
+    revalidateTag('plan')
+    revalidateTag('overview')
     return NextResponse.json({ ok: true })
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? 'Server error' }, { status: 500 })

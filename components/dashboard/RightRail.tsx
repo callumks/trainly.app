@@ -18,11 +18,36 @@ export function RightRail({ plan }: { plan: any }) {
           ))}
         </ul>
         <div className="mt-3 flex gap-2">
-          <button className="px-3 py-1 rounded-md border border-neutral-800 text-sm">Accept all</button>
-          <button className="px-3 py-1 rounded-md border border-neutral-800 text-sm">Revert</button>
+          <form action={async () => {
+            'use server'
+            await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/plan/accept`, { method: 'POST', cache: 'no-store' })
+          }}>
+            <button className="px-3 py-1 rounded-md border border-neutral-800 text-sm">Accept all</button>
+          </form>
+          <form action={async (formData: FormData) => {
+            'use server'
+            const v = Number(formData.get('version') || plan?.meta?.version || 1)
+            await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/plan/revert`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ version: v }),
+              cache: 'no-store'
+            })
+          }}>
+            <input type="hidden" name="version" value={Math.max(1, (plan?.meta?.version || 1) - 1)} />
+            <button className="px-3 py-1 rounded-md border border-neutral-800 text-sm">Revert</button>
+          </form>
         </div>
       </Card>
       <NutritionPanel enabled={!!plan?.weeks?.[0]?.nutrition?.enabled} />
+      <Card className="p-4 border-neutral-800 bg-neutral-950/60">
+        <div className="text-sm font-medium mb-2">Readiness</div>
+        <ul className="text-sm text-zinc-300 space-y-1">
+          <li>Sleep: —</li>
+          <li>HRV: —</li>
+          <li>Strain: —</li>
+        </ul>
+      </Card>
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
         <div className="text-sm font-medium mb-2">Upcoming goals</div>
         <ul className="text-sm text-zinc-300 space-y-1">

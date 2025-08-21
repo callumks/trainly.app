@@ -5,6 +5,8 @@ import { db } from '@/lib/supabase'
 import { StravaConnectButton } from '@/components/strava/connect-button'
 import { readActivePlan } from '@/lib/plan'
 import { KpiCards } from '@/components/KpiCards'
+import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 import { PlanWeek } from '@/components/PlanWeek'
 import { CoachChatDock } from '@/components/CoachChat'
 import { ActivitySyncBanner } from '@/components/ActivitySyncBanner'
@@ -24,7 +26,8 @@ export default async function DashboardPage() {
   // Get user profile
   const profileResult = await db.query('SELECT * FROM profiles WHERE id = $1', [decoded.userId])
   const profile = profileResult.rows[0]
-  const plan = await readActivePlan(decoded.userId)
+  const getPlan = unstable_cache(async (uid: string) => readActivePlan(uid), ['plan'], { tags: ['plan'] })
+  const plan = await getPlan(decoded.userId)
 
   return (
     <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">

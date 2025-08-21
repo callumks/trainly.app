@@ -62,3 +62,23 @@ export function diffPlan(prev: Plan, next: Plan): PlanDiff {
   }
 }
 
+// Read historical plan by exact version from stored rows
+export async function readPlanByVersion(userId: string, version: number): Promise<Plan | null> {
+  const res = await db.query(
+    `select metadata from training_plans where user_id=$1 and (metadata->'plan'->'meta'->>'version')::int = $2 order by updated_at desc limit 1`,
+    [userId, version]
+  )
+  const row = res.rows?.[0]
+  const meta = row?.metadata || null
+  return meta?.plan ?? null
+}
+
+// List available plan versions (descending)
+export async function readPlanVersions(userId: string): Promise<number[]> {
+  const res = await db.query(
+    `select distinct (metadata->'plan'->'meta'->>'version')::int as v from training_plans where user_id=$1 order by v desc`,
+    [userId]
+  )
+  return res.rows.map((r: any) => r.v).filter((v: any) => Number.isFinite(v))
+}
+

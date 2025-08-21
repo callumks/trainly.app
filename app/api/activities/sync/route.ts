@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { db } from '@/lib/supabase'
+import { revalidateTag } from 'next/cache'
 import { syncStravaActivitiesForUser } from '@/lib/strava'
 import { computeIfTss } from '@/lib/metrics'
 
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest) {
       await db.query('UPDATE strava_activities SET metadata = $1 WHERE id = $2', [merged, r.id])
     }
 
+    revalidateTag('activities')
+    revalidateTag('overview')
     return NextResponse.json({ success: true, ...result })
   } catch (e: any) {
     console.error('sync error', e)
