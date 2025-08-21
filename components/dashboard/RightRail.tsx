@@ -2,19 +2,10 @@ import React from 'react'
 import { Card } from '@/components/ui/card'
 import { NutritionPanel } from '@/components/NutritionPanel'
 import { ActivitySyncBanner } from '@/components/ActivitySyncBanner'
-import { useEffect, useState } from 'react'
-import { subscribePlanUpdated } from '@/lib/realtime'
 
 export function RightRail({ plan }: { plan: any }) {
-  const [updates, setUpdates] = useState<any[]>([])
-  useEffect(()=>{
-    const userId = plan?.userId || ''
-    if (!userId) return
-    const off = subscribePlanUpdated(userId, (p)=>{
-      setUpdates((u)=> [p, ...u].slice(0,3))
-    })
-    return off
-  },[plan?.userId])
+  // Server-rendered placeholder list until realtime channel is wired client-side
+  const updates: any[] = []
 
   return (
     <div className="space-y-4">
