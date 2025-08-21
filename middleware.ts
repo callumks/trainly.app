@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import jwt from 'jsonwebtoken'
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -14,15 +13,8 @@ export function middleware(req: NextRequest) {
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
-  try {
-    const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
-    jwt.verify(token, secret)
-    return NextResponse.next()
-  } catch {
-    const url = req.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
-  }
+  // Avoid JWT verification in Edge middleware; verification happens in server routes/pages
+  return NextResponse.next()
 }
 
 export const config = {
