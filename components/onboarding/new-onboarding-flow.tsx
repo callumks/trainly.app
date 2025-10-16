@@ -22,7 +22,7 @@ import { PlanPreviewStep } from './steps/PlanPreviewStep'
 import { CommunityCoachingStep } from './steps/CommunityCoachingStep'
 import { FinalReviewStep } from './steps/FinalReviewStep'
 
-interface OnboardingData {
+export interface OnboardingData {
   // Welcome & Account Setup
   email: string
   password: string
