@@ -195,7 +195,7 @@ export function NewOnboardingFlow({ userId }: OnboardingFlowProps) {
     const step = STEPS[currentStep]
     switch (step.id) {
       case 'welcome':
-        return onboardingData.name && onboardingData.email
+        return !!(onboardingData.name && onboardingData.email)
       case 'sports':
         return onboardingData.selectedSports.length > 0
       case 'goals':
@@ -205,7 +205,7 @@ export function NewOnboardingFlow({ userId }: OnboardingFlowProps) {
       case 'history':
         return true // Optional step
       case 'preferences':
-        return onboardingData.planType && onboardingData.trainingStructure
+        return !!(onboardingData.planType && onboardingData.trainingStructure)
       case 'nutrition':
         return true // Optional step
       case 'recovery':
