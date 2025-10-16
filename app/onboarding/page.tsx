@@ -3,8 +3,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { db } from '@/lib/supabase'
-import { OnboardingLanding } from '@/components/coach/OnboardingLanding'
-import MinimalTopbar from '@/components/nav/MinimalTopbar'
+import { NewOnboardingFlow } from '@/components/onboarding/new-onboarding-flow'
 
 export default async function OnboardingPage() {
   const token = cookies().get('auth-token')?.value
@@ -15,22 +14,15 @@ export default async function OnboardingPage() {
 
   // Check if user already completed onboarding
   const result = await db.query(
-    'SELECT goals, sports, experience_level FROM profiles WHERE id = $1',
+    'SELECT onboarding_completed FROM profiles WHERE id = $1',
     [decoded.userId]
   )
   const profile = result.rows[0]
 
   // If profile is complete, redirect to dashboard
-  if (profile?.goals && profile?.sports && profile?.experience_level) {
+  if (profile?.onboarding_completed) {
     redirect('/dashboard')
   }
 
-  return (
-    <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
-      <MinimalTopbar />
-      <div className="px-4 py-10">
-        <OnboardingLanding onSubmit={() => {}} />
-      </div>
-    </div>
-  )
+  return <NewOnboardingFlow userId={decoded.userId} />
 } 
