@@ -1,5 +1,6 @@
 import React from 'react'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import jwt from 'jsonwebtoken'
 import { db } from '@/lib/supabase'
 import { StravaConnectButton } from '@/components/strava/connect-button'
@@ -28,6 +29,10 @@ export default async function DashboardPage({ searchParams }: { searchParams?: {
   // Get user profile
   const profileResult = await db.query('SELECT * FROM profiles WHERE id = $1', [decoded.userId])
   const profile = profileResult.rows[0]
+  // If onboarding not complete, redirect to onboarding
+  if (!profile?.goals || !profile?.sports || !profile?.experience_level) {
+    redirect('/onboarding')
+  }
   const weekOffset = Number(searchParams?.weekOffset || '0')
   const getPlan = unstable_cache(async (uid: string, offset: number) => readActivePlan(uid), ['plan', String(weekOffset)], { tags: ['plan', `plan:${weekOffset}`] })
   const plan = await getPlan(decoded.userId, weekOffset)
