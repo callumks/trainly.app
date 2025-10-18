@@ -17,12 +17,35 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit?: (t
   const [text, setText] = useState('')
   const [copied, setCopied] = useState(false)
   const [chips, setChips] = useState<string[]>([])
+  const [submitting, setSubmitting] = useState(false)
 
   const toggle = (v: string) => setChips((prev)=> prev.includes(v) ? prev.filter(x=>x!==v) : [...prev, v])
 
   const buildPrompt = () => {
     const addons = chips.length ? `\n\nChips: ${chips.join(', ')}` : ''
     return `${(text || SEED).trim()}${addons}`
+  }
+
+  const persistOnboardingAndGo = async (seed: string) => {
+    try {
+      setSubmitting(true)
+      const selectedSports = chips.filter(c => SPORTS.includes(c))
+      const selectedGoals = chips.filter(c => GOALS.includes(c))
+      const selectedTime = chips.find(c => TIME.includes(c))
+      const weeklyVolume = selectedTime ? parseInt(String(selectedTime).replace(/[^0-9]/g, ''), 10) || null : null
+      await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ goals: selectedGoals, sports: selectedSports, weekly_volume: weeklyVolume }),
+      })
+    } catch (_) {
+      // swallow for MVP; proceed to coach regardless
+    } finally {
+      if (typeof window !== 'undefined') {
+        window.location.href = `/coach?seed=${encodeURIComponent(seed)}`
+      }
+    }
   }
 
   return (
@@ -62,7 +85,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit?: (t
                 value={text}
                 onChange={(e)=>setText(e.target.value)}
                 placeholder="Paste the example or describe your sports, goals, schedule, injuries. Enter to send, Shift+Enter for newline."
-                onKeyDown={(e)=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); if(onSubmit){ onSubmit(buildPrompt()) } else { window.location.href = `/coach?seed=${encodeURIComponent(buildPrompt())}` } } }}
+                onKeyDown={(e)=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); const seed = buildPrompt(); if(onSubmit){ onSubmit(seed) } else { persistOnboardingAndGo(seed) } } }}
                 className="bg-neutral-950 border-neutral-800 focus-visible:ring-zinc-700"
               />
 
@@ -72,7 +95,7 @@ export function OnboardingLanding({ onSubmit, stravaConnected }: { onSubmit?: (t
                   <Button variant="secondary" onClick={()=>{ setText(SEED); navigator.clipboard.writeText(SEED); setCopied(true); setTimeout(()=>setCopied(false), 1200) }}>
                     {copied ? <Check className="mr-2 h-4 w-4" /> : <Clipboard className="mr-2 h-4 w-4" />} Use example
                   </Button>
-                  <Button onClick={()=> { if(onSubmit){ onSubmit(buildPrompt()) } else { window.location.href = `/coach?seed=${encodeURIComponent(buildPrompt())}` } }}>
+                  <Button disabled={submitting} onClick={()=> { const seed = buildPrompt(); if(onSubmit){ onSubmit(seed) } else { persistOnboardingAndGo(seed) } }}>
                     <Sparkles className="mr-2 h-4 w-4" /> Generate plan
                   </Button>
                 </div>

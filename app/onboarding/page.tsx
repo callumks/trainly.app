@@ -12,15 +12,15 @@ export default async function OnboardingPage() {
   const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
   const decoded = jwt.verify(token, secret) as { userId: string; email: string }
 
-  // Check if user already completed onboarding
+  // Check if user already completed onboarding using existing fields
   const result = await db.query(
-    'SELECT onboarding_completed FROM profiles WHERE id = $1',
+    'SELECT goals, sports, experience_level FROM profiles WHERE id = $1',
     [decoded.userId]
   )
   const profile = result.rows[0]
 
-  // If profile is complete, redirect to dashboard
-  if (profile?.onboarding_completed) {
+  // If profile has core fields, redirect to dashboard
+  if (profile?.goals && profile?.sports && profile?.experience_level) {
     redirect('/dashboard')
   }
 

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { useSupabase } from '@/components/providers/supabase-provider'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -105,7 +104,6 @@ const STEPS = [
 ]
 
 export function NewOnboardingFlow({ userId }: OnboardingFlowProps) {
-  const { supabase } = useSupabase()
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -166,21 +164,23 @@ export function NewOnboardingFlow({ userId }: OnboardingFlowProps) {
   const handleComplete = async () => {
     setLoading(true)
     try {
-      // Save onboarding data to database
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          onboarding_completed: true,
-          onboarding_data: onboardingData,
-          // Extract key fields for backward compatibility
-          goals: onboardingData.goals.map(g => g.goal),
-          sports: onboardingData.selectedSports,
-          experience_level: onboardingData.baselineFatigue.energy > 7 ? 'advanced' : 
-                           onboardingData.baselineFatigue.energy > 4 ? 'intermediate' : 'beginner',
-        })
-        .eq('id', userId)
+      // Persist key onboarding fields via API
+      const goals = onboardingData.goals.map(g => g.goal)
+      const sports = onboardingData.selectedSports
+      const experience_level = onboardingData.baselineFatigue.energy > 7 ? 'advanced' : 
+                               onboardingData.baselineFatigue.energy > 4 ? 'intermediate' : 'beginner'
+      const weekly_volume = typeof onboardingData.weeklyHours?.overall === 'number' ? onboardingData.weeklyHours.overall : undefined
 
-      if (error) throw error
+      const res = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ goals, sports, experience_level, weekly_volume }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j.error || 'Failed to save onboarding')
+      }
 
       toast.success('Welcome to Trainly! Your personalized training plan is ready.')
       router.push('/dashboard')
