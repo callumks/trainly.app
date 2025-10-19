@@ -23,8 +23,6 @@ import { FinalReviewStep } from './steps/FinalReviewStep'
 
 export interface OnboardingData {
   // Welcome & Account Setup
-  email: string
-  password: string
   name: string
   oauthProvider?: 'strava' | 'google' | 'apple'
   
@@ -108,8 +106,6 @@ export function NewOnboardingFlow({ userId }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-    email: '',
-    password: '',
     name: '',
     selectedSports: [],
     sportOrder: [],
@@ -195,7 +191,7 @@ export function NewOnboardingFlow({ userId }: OnboardingFlowProps) {
     const step = STEPS[currentStep]
     switch (step.id) {
       case 'welcome':
-        return !!(onboardingData.name && onboardingData.email)
+        return !!onboardingData.name
       case 'sports':
         return onboardingData.selectedSports.length > 0
       case 'goals':

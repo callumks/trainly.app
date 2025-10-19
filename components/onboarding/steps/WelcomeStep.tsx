@@ -5,10 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { OnboardingData } from '../new-onboarding-flow'
-import { Mail, Lock, User, Activity, Apple, Chrome } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { User } from 'lucide-react'
 
 interface WelcomeStepProps {
   data: OnboardingData
@@ -20,13 +18,6 @@ interface WelcomeStepProps {
 }
 
 export function WelcomeStep({ data, updateData, onNext, loading, canProceed }: WelcomeStepProps) {
-  const [showOAuth, setShowOAuth] = useState(false)
-
-  const handleOAuth = (provider: 'strava' | 'google' | 'apple') => {
-    updateData({ oauthProvider: provider })
-    // TODO: Implement OAuth flow
-    onNext()
-  }
 
   return (
     <div className="space-y-6">
@@ -45,11 +36,11 @@ export function WelcomeStep({ data, updateData, onNext, loading, canProceed }: W
         </div>
       </div>
 
-      {/* Account Setup */}
+      {/* Quick intro */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white">Create your account</h3>
+        <h3 className="text-lg font-semibold text-white">Welcome</h3>
         
-        {/* Email/Password Form */}
+        {/* Name only */}
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-neutral-300">Full Name</Label>
@@ -64,72 +55,6 @@ export function WelcomeStep({ data, updateData, onNext, loading, canProceed }: W
                 className="pl-10 bg-neutral-900 border-neutral-700 text-white"
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-neutral-300">Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-neutral-500" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={data.email}
-                onChange={(e) => updateData({ email: e.target.value })}
-                className="pl-10 bg-neutral-900 border-neutral-700 text-white"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-neutral-300">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-neutral-500" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={data.password}
-                onChange={(e) => updateData({ password: e.target.value })}
-                className="pl-10 bg-neutral-900 border-neutral-700 text-white"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* OAuth Options */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <div className="flex-1 h-px bg-neutral-700" />
-            <span className="text-neutral-400 text-sm">or continue with</span>
-            <div className="flex-1 h-px bg-neutral-700" />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Button
-              variant="outline"
-              onClick={() => handleOAuth('strava')}
-              className="bg-neutral-900 border-neutral-700 hover:bg-neutral-800 text-white"
-            >
-              <Activity className="mr-2 h-4 w-4" />
-              Strava
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleOAuth('google')}
-              className="bg-neutral-900 border-neutral-700 hover:bg-neutral-800 text-white"
-            >
-              <Chrome className="mr-2 h-4 w-4" />
-              Google
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleOAuth('apple')}
-              className="bg-neutral-900 border-neutral-700 hover:bg-neutral-800 text-white"
-            >
-              <Apple className="mr-2 h-4 w-4" />
-              Apple
-            </Button>
           </div>
         </div>
       </div>
