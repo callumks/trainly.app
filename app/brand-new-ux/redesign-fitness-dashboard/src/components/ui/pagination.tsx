@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { cn } from "./utils";
 import { Button, buttonVariants } from "./button";
 
-export function Pagination(){ return null }
+function Pagination(){ return null }
 
 function PaginationContent({
   className,
