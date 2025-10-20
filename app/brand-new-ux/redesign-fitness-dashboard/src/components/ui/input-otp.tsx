@@ -5,6 +5,10 @@ import { Minus } from "lucide-react";
 
 import { cn } from "./utils";
 
+type OTPSlot = { char?: string; hasFakeCaret?: boolean; isActive?: boolean }
+type OTPContext = { slots: OTPSlot[] }
+const OTPInputContext = React.createContext<OTPContext | null>(null)
+
 function InputOTP(){ return null }
 
 function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
