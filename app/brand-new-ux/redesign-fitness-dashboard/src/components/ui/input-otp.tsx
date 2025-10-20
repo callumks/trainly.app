@@ -5,7 +5,7 @@ import { Minus } from "lucide-react";
 
 import { cn } from "./utils";
 
-export function InputOTP(){ return null }
+function InputOTP(){ return null }
 
 function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
