@@ -11,13 +11,17 @@ export function NextUp() {
       .catch(()=>{})
     return ()=>{ cancelled = true }
   },[])
-  if (!data) return null
+  if (!data) return (
+    <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4 text-zinc-400 text-sm">
+      Next up: NA
+    </div>
+  )
   return (
     <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4 text-zinc-200 flex items-center justify-between">
       <div>
         <div className="text-xs text-zinc-400">Next up</div>
-        <div className="text-lg font-medium">{data.name}</div>
-        <div className="text-xs text-zinc-500">{data.date}</div>
+        <div className="text-lg font-medium truncate max-w-[50vw]">{data.name || 'NA'}</div>
+        <div className="text-xs text-zinc-500">{data.date || 'NA'}</div>
       </div>
       <div className="flex items-center gap-2">
         <button

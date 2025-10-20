@@ -9,11 +9,11 @@ export function PlanWeek({ start, sessions }: { start: string; sessions: Session
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
         {sessions.map((s) => (
           <Card key={s.id} className="p-3">
-            <div className="flex justify-between">
-              <div className="font-medium">{s.title}</div>
-              <div className="text-xs text-zinc-500">{s.sport}</div>
+            <div className="flex justify-between gap-3">
+              <div className="font-medium truncate max-w-[60%]">{s.title || 'NA'}</div>
+              <div className="text-xs text-zinc-500 truncate">{s.sport || 'NA'}</div>
             </div>
-            {s.description && <div className="text-sm mt-1">{s.description}</div>}
+            {s.description && <div className="text-sm mt-1 line-clamp-3 break-words">{s.description}</div>}
           </Card>
         ))}
       </div>

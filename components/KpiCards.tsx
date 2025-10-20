@@ -12,19 +12,19 @@ export function KpiCards() {
       .then(r=>r.json()).then(j=>{ if(!canceled) setData(j) }).catch(()=>{})
     return ()=>{ canceled = true }
   },[])
-  const items = [
-    data?.ftp != null ? { label: 'Current FTP', value: `${data.ftp} W` } : null,
-    data ? { label: 'Weekly Work', value: `${Math.round((data.weeklyWorkKJ||0))} kJ` } : null,
-    data ? { label: 'Volume (7d)', value: `${data.weeklyHours?.toFixed(1)} h` } : null,
-    data ? { label: 'Trend', value: `${data.trendPct>0?'+':''}${data.trendPct}%` } : null,
-    data ? { label: 'Compliance', value: `${data.compliance}%` } : null,
-  ].filter(Boolean) as { label: string; value: string }[]
+  const items: { label: string; value: string }[] = [
+    { label: 'Current FTP', value: data?.ftp != null ? `${data.ftp} W` : 'NA' },
+    { label: 'Weekly Work', value: data?.weeklyWorkKJ != null ? `${Math.round(data.weeklyWorkKJ)} kJ` : 'NA' },
+    { label: 'Volume (7d)', value: data?.weeklyHours != null ? `${data.weeklyHours.toFixed(1)} h` : 'NA' },
+    { label: 'Trend', value: data?.trendPct != null ? `${data.trendPct>0?'+':''}${data.trendPct}%` : 'NA' },
+    { label: 'Compliance', value: data?.compliance != null ? `${data.compliance}%` : 'NA' },
+  ]
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
       {items.map((it) => (
         <Card key={it.label} className="p-4">
           <div className="text-xs text-zinc-400">{it.label}</div>
-          <div className="text-xl font-semibold mt-1">{it.value}</div>
+          <div className="text-xl font-semibold mt-1 truncate">{it.value}</div>
         </Card>
       ))}
     </div>

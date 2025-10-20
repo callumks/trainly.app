@@ -15,7 +15,7 @@ export function UserRail({ profile }: { profile: any }) {
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-neutral-800" />
           <div>
-            <div className="font-medium text-zinc-100">{profile?.full_name || profile?.email || 'Athlete'}</div>
+            <div className="font-medium text-zinc-100 truncate max-w-[180px]">{profile?.full_name || profile?.email || 'Athlete'}</div>
             <div className="text-xs text-zinc-400">Hybrid athlete</div>
           </div>
         </div>
@@ -35,8 +35,8 @@ export function UserRail({ profile }: { profile: any }) {
 
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
         <div className="text-sm font-medium mb-3">Your sports & goals</div>
-        <div className="text-xs text-zinc-400">Sports: {(profile?.sports || []).join(', ') || 'Not set'}</div>
-        <div className="text-xs text-zinc-400 mt-1">Goals: {(profile?.goals || []).join(', ') || 'Not set'}</div>
+        <div className="text-xs text-zinc-400 truncate">Sports: {(profile?.sports || []).join(', ') || 'NA'}</div>
+        <div className="text-xs text-zinc-400 mt-1 truncate">Goals: {(profile?.goals || []).join(', ') || 'NA'}</div>
       </Card>
       <RecentActivities userId={profile?.id || ''} />
     </div>
