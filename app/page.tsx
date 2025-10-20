@@ -12,7 +12,7 @@ export default async function HomePage() {
       const decoded = jwt.verify(token, secret) as { userId: string }
       const res = await db.query('SELECT goals, sports, experience_level FROM profiles WHERE id=$1', [decoded.userId])
       const profile = res.rows[0]
-      if (!profile?.goals || !profile?.sports || !profile?.experience_level) {
+      if (!profile?.goals || !profile?.sports) {
         redirect('/onboarding')
       }
       redirect('/dashboard')

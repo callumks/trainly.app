@@ -29,8 +29,8 @@ export default async function DashboardPage({ searchParams }: { searchParams?: {
   // Get user profile
   const profileResult = await db.query('SELECT * FROM profiles WHERE id = $1', [decoded.userId])
   const profile = profileResult.rows[0]
-  // If onboarding not complete, redirect to onboarding
-  if (!profile?.goals || !profile?.sports || !profile?.experience_level) {
+  // If onboarding not complete, redirect to onboarding (goals + sports suffice for MVP)
+  if (!profile?.goals || !profile?.sports) {
     redirect('/onboarding')
   }
   const weekOffset = Number(searchParams?.weekOffset || '0')
