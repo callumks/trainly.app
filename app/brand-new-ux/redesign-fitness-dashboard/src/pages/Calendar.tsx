@@ -1,3 +1,4 @@
+"use client";
 import { motion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Bike, Footprints, Dumbbell } from 'lucide-react';
 import { Button } from '../components/ui/button';

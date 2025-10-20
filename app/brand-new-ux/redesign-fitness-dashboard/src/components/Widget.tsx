@@ -1,3 +1,4 @@
+"use client";
 import { motion } from 'motion/react';
 import { GripVertical, X, Maximize2, Minimize2 } from 'lucide-react';
 import { ReactNode, useState, forwardRef } from 'react';
