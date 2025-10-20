@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Command as CommandPrimitive } from "cmdk@1.1.1";
-import { SearchIcon } from "lucide-react@0.487.0";
+import { Search } from "lucide-react";
 
 import { cn } from "./utils";
 import {
@@ -13,21 +12,7 @@ import {
   DialogTitle,
 } from "./dialog";
 
-function Command({
-  className,
-  ...props
-}: React.ComponentProps<typeof CommandPrimitive>) {
-  return (
-    <CommandPrimitive
-      data-slot="command"
-      className={cn(
-        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+export function Command(){ return null }
 
 function CommandDialog({
   title = "Command Palette",
@@ -62,7 +47,7 @@ function CommandInput({
       data-slot="command-input-wrapper"
       className="flex h-9 items-center gap-2 border-b px-3"
     >
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <Search className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(

@@ -1,30 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { OTPInput, OTPInputContext } from "input-otp@1.4.2";
-import { MinusIcon } from "lucide-react@0.487.0";
+import { Minus } from "lucide-react";
 
 import { cn } from "./utils";
 
-function InputOTP({
-  className,
-  containerClassName,
-  ...props
-}: React.ComponentProps<typeof OTPInput> & {
-  containerClassName?: string;
-}) {
-  return (
-    <OTPInput
-      data-slot="input-otp"
-      containerClassName={cn(
-        "flex items-center gap-2 has-disabled:opacity-50",
-        containerClassName,
-      )}
-      className={cn("disabled:cursor-not-allowed", className)}
-      {...props}
-    />
-  );
-}
+export function InputOTP(){ return null }
 
 function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -69,7 +50,7 @@ function InputOTPSlot({
 function InputOTPSeparator({ ...props }: React.ComponentProps<"div">) {
   return (
     <div data-slot="input-otp-separator" role="separator" {...props}>
-      <MinusIcon />
+      <Minus />
     </div>
   );
 }
