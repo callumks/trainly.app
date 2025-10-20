@@ -160,7 +160,6 @@ export {
   useFormField,
   Form,
   FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
   FormMessage,
