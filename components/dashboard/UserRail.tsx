@@ -34,12 +34,9 @@ export function UserRail({ profile }: { profile: any }) {
       </Card>
 
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
-        <div className="text-sm font-medium mb-3">Sports</div>
-        <div className="flex flex-wrap gap-2">
-          {SPORTS.map(s => (
-            <button key={s} onClick={()=>toggle(s)} className={`px-3 py-1 rounded-full text-xs border transition ${selected.includes(s) ? 'bg-neutral-800 border-neutral-600 text-zinc-100' : 'border-neutral-800 text-zinc-400 hover:text-zinc-200'}`}>{s}</button>
-          ))}
-        </div>
+        <div className="text-sm font-medium mb-3">Your sports & goals</div>
+        <div className="text-xs text-zinc-400">Sports: {(profile?.sports || []).join(', ') || 'Not set'}</div>
+        <div className="text-xs text-zinc-400 mt-1">Goals: {(profile?.goals || []).join(', ') || 'Not set'}</div>
       </Card>
       <RecentActivities userId={profile?.id || ''} />
     </div>

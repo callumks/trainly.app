@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { db } from '@/lib/supabase'
 import { NewOnboardingFlow } from '@/components/onboarding/new-onboarding-flow'
+import { QuickOnboarding } from '@/components/onboarding/QuickOnboarding'
 
 export default async function OnboardingPage() {
   const token = cookies().get('auth-token')?.value
@@ -24,5 +25,5 @@ export default async function OnboardingPage() {
     redirect('/dashboard')
   }
 
-  return <NewOnboardingFlow userId={decoded.userId} />
+  return <QuickOnboarding />
 } 

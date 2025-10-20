@@ -3,6 +3,7 @@ import { ReadinessCard } from '@/components/dashboard/ReadinessCard'
 import { Card } from '@/components/ui/card'
 import { NutritionPanel } from '@/components/NutritionPanel'
 import { ActivitySyncBanner } from '@/components/ActivitySyncBanner'
+import { StravaConnectButton } from '@/components/strava/connect-button'
 
 export function RightRail({ plan }: { plan: any }) {
   // Server-rendered placeholder list until realtime channel is wired client-side
@@ -11,6 +12,12 @@ export function RightRail({ plan }: { plan: any }) {
   return (
     <div className="space-y-4">
       <ActivitySyncBanner hasNew={updates.length>0} />
+      {/* Strava notice */}
+      <Card className="p-4 border-neutral-800 bg-neutral-950/60">
+        <div className="text-sm font-medium mb-2">Dynamic plan updates</div>
+        <div className="text-sm text-zinc-400 mb-3">Connect Strava to enable automatic training plan updates based on your activity feed.</div>
+        <StravaConnectButton />
+      </Card>
       <Card className="p-4 border-neutral-800 bg-neutral-950/60">
         <div className="text-sm font-medium mb-2">Plan updates</div>
         <ul className="text-sm text-zinc-300 space-y-1">
