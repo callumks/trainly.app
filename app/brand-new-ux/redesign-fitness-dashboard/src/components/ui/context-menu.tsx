@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
+import { ChevronRight } from "lucide-react";
 import { cn } from "./utils";
 
 export const ContextMenu = ContextMenuPrimitive.Root
@@ -66,7 +67,7 @@ function ContextMenuSubTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto" />
+      <ChevronRight className="ml-auto" />
     </ContextMenuPrimitive.SubTrigger>
   );
 }
