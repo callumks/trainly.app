@@ -18,6 +18,7 @@ import { BottomNav } from '@/components/nav/BottomNav'
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolbar'
 import Link from 'next/link'
 import { NextUp } from '@/components/dashboard/NextUp'
+import { DashboardShell } from '@/components/dashboard/DashboardShell'
 
 export default async function DashboardPage({ searchParams }: { searchParams?: { weekOffset?: string } }) {
   const token = cookies().get('auth-token')?.value
@@ -38,42 +39,26 @@ export default async function DashboardPage({ searchParams }: { searchParams?: {
   const plan = await getPlan(decoded.userId, weekOffset)
 
   return (
-    <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
-      <div className="mx-auto max-w-[1220px] px-4 pb-20 pt-6">
-        {/* Header texts removed per design feedback */}
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left rail */}
-          <div className="hidden lg:block lg:col-span-3 sticky top-16 self-start">
-            <UserRail profile={profile} />
-          </div>
-
-          {/* Center column */}
-          <div className="lg:col-span-6 space-y-6">
-            <DashboardToolbar />
-            <KpiCards />
-            {/* Next up block */}
-            <NextUp />
-            {plan ? (
-              <div className="space-y-4">
-                {plan.weeks.map((w: any)=> (
-                  <PlanWeek key={w.start} start={w.start} sessions={w.sessions} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-zinc-400">No plan yet. Generate one in the coach.</div>
-            )}
-          </div>
-
-          {/* Right rail */}
-          <div className="lg:col-span-3 sticky top-16 self-start">
-            <RightRail plan={plan} />
-          </div>
+    <DashboardShell
+      left={<UserRail profile={profile} />}
+      center={(
+        <div className="space-y-6">
+          <DashboardToolbar />
+          <KpiCards />
+          <NextUp />
+          {plan ? (
+            <div className="space-y-4">
+              {plan.weeks.map((w: any) => (
+                <PlanWeek key={w.start} start={w.start} sessions={w.sessions} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-zinc-400">No plan yet. Generate one in the coach.</div>
+          )}
+          <CoachChatDock />
         </div>
-
-        <CoachChatDock />
-        <BottomNav />
-      </div>
-    </div>
+      )}
+      right={<RightRail plan={plan} />}
+    />
   )
 }
