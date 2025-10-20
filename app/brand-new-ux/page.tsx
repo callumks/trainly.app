@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 import { redirect } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
-const RedesignApp = dynamic(() => import('./Redesign Fitness Dashboard/src/App').then(m => m.default), { ssr: false })
+const RedesignApp = dynamic(() => import('./redesign-fitness-dashboard/src/App').then(m => m.default), { ssr: false })
 
 export default async function BrandNewUxHome() {
   const token = cookies().get('auth-token')?.value

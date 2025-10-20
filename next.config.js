@@ -3,6 +3,13 @@ const nextConfig = {
   images: {
     domains: ["dgalywyr863hv.cloudfront.net", "via.placeholder.com"],
   },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'motion/react': 'framer-motion',
+    };
+    return config;
+  },
   async headers() {
     return [
       {
