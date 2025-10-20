@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 
 import { cn } from "./utils";
 
-export const NavigationMenu = NavigationMenuPrimitive.Root
+const NavigationMenu = NavigationMenuPrimitive.Root
 
 function NavigationMenuList({
   className,

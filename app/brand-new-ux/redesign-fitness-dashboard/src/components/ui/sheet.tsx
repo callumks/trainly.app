@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 
 import { cn } from "./utils";
 
-export const Sheet = SheetPrimitive.Root
+const Sheet = SheetPrimitive.Root
 
 function SheetTrigger({
   ...props

@@ -12,6 +12,7 @@ import {
   type FieldPath,
   type FieldValues,
 } from "react-hook-form@7.55.0";
+} from "react-hook-form";
 
 import { cn } from "./utils";
 import { Label } from "./label";
