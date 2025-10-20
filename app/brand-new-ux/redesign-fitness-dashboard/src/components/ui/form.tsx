@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import * as LabelPrimitive from "@radix-ui/react-label@2.1.2";
-import { Slot } from "@radix-ui/react-slot@1.1.2";
+import * as LabelPrimitive from "@radix-ui/react-label";
+import { Slot } from "@radix-ui/react-slot";
 import {
   Controller,
   FormProvider,
@@ -29,7 +29,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,
 );
 
-const FormField = <
+export const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
@@ -65,32 +65,10 @@ const useFormField = () => {
   };
 };
 
-type FormItemContextValue = {
-  id: string;
-};
-
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue,
-);
-
-function FormItem({ className, ...props }: React.ComponentProps<"div">) {
-  const id = React.useId();
-
-  return (
-    <FormItemContext.Provider value={{ id }}>
-      <div
-        data-slot="form-item"
-        className={cn("grid gap-2", className)}
-        {...props}
-      />
-    </FormItemContext.Provider>
-  );
-}
-
-function FormLabel({
+export const FormLabel = ({
   className,
   ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+}: React.ComponentProps<typeof LabelPrimitive.Root>) => {
   const { error, formItemId } = useFormField();
 
   return (
@@ -102,7 +80,7 @@ function FormLabel({
       {...props}
     />
   );
-}
+};
 
 function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
   const { error, formItemId, formDescriptionId, formMessageId } =
@@ -153,6 +131,28 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     >
       {body}
     </p>
+  );
+}
+
+type FormItemContextValue = {
+  id: string;
+};
+
+const FormItemContext = React.createContext<FormItemContextValue>(
+  {} as FormItemContextValue,
+);
+
+function FormItem({ className, ...props }: React.ComponentProps<"div">) {
+  const id = React.useId();
+
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <div
+        data-slot="form-item"
+        className={cn("grid gap-2", className)}
+        {...props}
+      />
+    </FormItemContext.Provider>
   );
 }
 
