@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import { ActivityItem } from '../ActivityItem';
 import { Button } from '../ui/button';

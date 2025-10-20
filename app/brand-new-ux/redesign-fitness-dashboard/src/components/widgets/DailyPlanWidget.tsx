@@ -1,12 +1,12 @@
 "use client";
-import { useState } from 'react';
-import { motion } from 'motion/react';
+import React from 'react'
+import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CarouselDayCard } from '../CarouselDayCard';
 import { Button } from '../ui/button';
 
 export function DailyPlanWidget() {
-  const [focusedDayIndex, setFocusedDayIndex] = useState(3); // Thursday is today
+  const [focusedDayIndex, setFocusedDayIndex] = React.useState(3); // Thursday is today
 
   const weekDays = [
     { day: 'MON', date: 'Oct 14', workload: 250, duration: '1h 15m' },

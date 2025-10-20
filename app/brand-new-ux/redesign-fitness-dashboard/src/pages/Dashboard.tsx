@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Activity } from 'lucide-react';
 import { Widget } from '../components/Widget';
 import { DailyPlanWidget } from '../components/widgets/DailyPlanWidget';
