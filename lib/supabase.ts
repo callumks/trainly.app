@@ -7,7 +7,8 @@ function ensurePool(): Pool {
     const connectionString = process.env.DATABASE_URL
     pool = new Pool({
       connectionString,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      // PGSSL=disable for private-network Postgres (e.g. Railway internal) which has no TLS
+      ssl: process.env.PGSSL === 'disable' ? false : process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     })
   }
   return pool
