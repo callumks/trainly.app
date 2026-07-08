@@ -17,28 +17,28 @@ export async function GET(request: NextRequest) {
     startOfWeek.setDate(now.getDate() - now.getDay())
     const endOfWeek = new Date(startOfWeek)
     endOfWeek.setDate(startOfWeek.getDate() + 6)
+    const toISO = (d: Date) => d.toISOString().slice(0, 10)
 
-    const toISO = (d: Date) => d.toISOString().slice(0,10)
-
-    const ftpRes = await db.query(`SELECT NULLIF((metadata->>'ftp')::int,0) AS ftp FROM profiles WHERE id=$1`, [userId])
-    const ftp = ftpRes.rows?.[0]?.ftp ?? null
-
+    // Weekly load (TSS computed during sync, in metadata.computed.tss), kJ (Strava kilojoules),
+    // and moving time. All read from columns/JSON that actually exist.
     const volRes = await db.query(
       `WITH w AS (
-         SELECT SUM(COALESCE(metadata->'computed'->>'tss', '0')::float) as tss,
-                SUM(COALESCE(work_kj,0)) as work_kj,
-                SUM(COALESCE(moving_time,0)) as secs
-         FROM strava_activities WHERE user_id=$1 AND start_date>=NOW()-interval '7 days'
+         SELECT COALESCE(SUM(COALESCE((metadata->'computed'->>'tss')::float, 0)), 0) AS tss,
+                COALESCE(SUM(COALESCE(NULLIF(metadata->>'kilojoules','')::float, 0)), 0) AS kj,
+                COALESCE(SUM(COALESCE(moving_time, 0)), 0) AS secs
+         FROM strava_activities WHERE user_id=$1 AND start_date >= NOW() - interval '7 days'
        ), p AS (
-         SELECT SUM(COALESCE(work_kj,0)) as work_kj_prev
-         FROM strava_activities WHERE user_id=$1 AND start_date>=NOW()-interval '14 days' AND start_date<NOW()-interval '7 days'
-       ) SELECT w.tss, w.work_kj, w.secs, p.work_kj_prev FROM w, p`,
+         SELECT COALESCE(SUM(COALESCE((metadata->'computed'->>'tss')::float, 0)), 0) AS tss_prev
+         FROM strava_activities WHERE user_id=$1 AND start_date >= NOW() - interval '14 days' AND start_date < NOW() - interval '7 days'
+       ) SELECT w.tss, w.kj, w.secs, p.tss_prev FROM w, p`,
       [userId]
     )
-    const secs = Number(volRes.rows?.[0]?.secs || 0)
-    const work_kj = Number(volRes.rows?.[0]?.work_kj || 0)
-    const work_kj_prev = Number(volRes.rows?.[0]?.work_kj_prev || 0)
-    const trendPct = work_kj_prev > 0 ? Math.round(((work_kj - work_kj_prev) / work_kj_prev) * 100) : 0
+    const row = volRes.rows?.[0] || {}
+    const secs = Number(row.secs || 0)
+    const weeklyTSS = Math.round(Number(row.tss || 0))
+    const weeklyWorkKJ = Math.round(Number(row.kj || 0))
+    const tssPrev = Number(row.tss_prev || 0)
+    const trendPct = tssPrev > 0 ? Math.round(((weeklyTSS - tssPrev) / tssPrev) * 100) : 0
 
     const compRes = await db.query(
       `SELECT CASE WHEN COUNT(*)=0 THEN 100 ELSE ROUND(100.0 * SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END)/COUNT(*),0) END::int AS compliance
@@ -47,10 +47,17 @@ export async function GET(request: NextRequest) {
     )
     const compliance = compRes.rows?.[0]?.compliance ?? 100
 
+    const profRes = await db.query('SELECT metadata FROM profiles WHERE id=$1', [userId])
+    const pmeta = profRes.rows?.[0]?.metadata || {}
+
     return NextResponse.json({
-      ftp: ftp,
-      weeklyWorkKJ: work_kj,
-      weeklyHours: Math.round((secs/3600)*10)/10,
+      ftp: pmeta.ftp ?? null,
+      ftpEstimated: !!pmeta.ftp_estimated,
+      powerCurve: pmeta.powerCurve ?? null,
+      lastSyncedAt: pmeta.last_synced_at ?? null,
+      weeklyTSS,
+      weeklyWorkKJ,
+      weeklyHours: Math.round((secs / 3600) * 10) / 10,
       trendPct,
       compliance,
     })
@@ -58,4 +65,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: e?.message || 'Failed' }, { status: 500 })
   }
 }
-

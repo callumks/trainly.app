@@ -2,9 +2,10 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
+import Link from 'next/link'
 import { db } from '@/lib/supabase'
 import { OnboardingLanding } from '@/components/coach/OnboardingLanding'
-import MinimalTopbar from '@/components/nav/MinimalTopbar'
+import '@/components/app/app.css'
 
 export default async function OnboardingPage() {
   const token = cookies().get('auth-token')?.value
@@ -13,24 +14,25 @@ export default async function OnboardingPage() {
   const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
   const decoded = jwt.verify(token, secret) as { userId: string; email: string }
 
-  // Check if user already completed onboarding
   const result = await db.query(
     'SELECT goals, sports, experience_level FROM profiles WHERE id = $1',
     [decoded.userId]
   )
   const profile = result.rows[0]
-
-  // If profile is complete, redirect to dashboard
   if (profile?.goals && profile?.sports && profile?.experience_level) {
     redirect('/dashboard')
   }
 
   return (
-    <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
-      <MinimalTopbar />
-      <div className="px-4 py-10">
-        <OnboardingLanding onSubmit={() => {}} />
+    <div className="tr-app">
+      <div className="topbar">
+        <Link href="/dashboard" className="brand"><span className="dot" />Trainly</Link>
+        <div className="spacer" />
+        <span className="meta">Step 1 — set up your training</span>
+      </div>
+      <div className="wrap" style={{ paddingTop: 32 }}>
+        <OnboardingLanding />
       </div>
     </div>
   )
-} 
+}

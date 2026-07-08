@@ -1,19 +1,13 @@
 import React from 'react'
-import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
-import { TrainingCalendar } from '@/components/training/training-calendar'
+import AppShell from '@/components/app/AppShell'
+import PageHeader from '@/components/app/PageHeader'
+import CalendarView from '@/components/training/CalendarView'
 
-export default async function CalendarPage() {
-  const token = cookies().get('auth-token')?.value
-  if (!token) return null
-  const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
-  const { userId } = jwt.verify(token, secret) as { userId: string }
-
+export default function CalendarPage() {
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold mb-6">Calendar</h2>
-      <TrainingCalendar userId={userId} />
-    </div>
+    <AppShell>
+      <PageHeader eyebrow="Schedule" title="Calendar" sub="Your week of sessions — cycling, climbing, and strength in one view." />
+      <CalendarView />
+    </AppShell>
   )
 }
-

@@ -174,3 +174,14 @@ BEGIN
   RAISE NOTICE 'Test user created with email: test@trainly.app';
 END
 $$;
+-- Coach chat history
+CREATE TABLE public.coach_messages (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('user','assistant')),
+  text TEXT NOT NULL,
+  plan JSONB,
+  plan_status TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+CREATE INDEX coach_messages_user_time_idx ON public.coach_messages(user_id, created_at);

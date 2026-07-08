@@ -1,12 +1,20 @@
 import React from 'react'
+import { Sparkles } from 'lucide-react'
+import AppShell from '@/components/app/AppShell'
+import PageHeader from '@/components/app/PageHeader'
 
-export default function InsightsPage() {
+export default function Page() {
   return (
-    <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
-      <div className="mx-auto max-w-[1220px] px-4 py-10 space-y-6">
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-5 text-zinc-300">Readiness, load, and trends coming soon</div>
+    <AppShell>
+      <PageHeader eyebrow="Analysis" title="Insights" sub="Readiness, load, and trends, read for you." />
+      <div className="card">
+        <div className="empty">
+          <div className="ei"><Sparkles /></div>
+          <h4>Insights are coming together</h4>
+          <p>Once data is flowing, Trainly will surface what's working and what to change.</p>
+          <span className="tag">Coming soon</span>
+        </div>
       </div>
-    </div>
+    </AppShell>
   )
 }
-

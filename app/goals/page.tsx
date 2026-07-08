@@ -1,12 +1,20 @@
 import React from 'react'
+import { Target } from 'lucide-react'
+import AppShell from '@/components/app/AppShell'
+import PageHeader from '@/components/app/PageHeader'
 
-export default function GoalsPage() {
+export default function Page() {
   return (
-    <div className="min-h-[100svh] bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900">
-      <div className="mx-auto max-w-[1220px] px-4 py-10 space-y-6">
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-5 text-zinc-300">Goals editor coming soon</div>
+    <AppShell>
+      <PageHeader eyebrow="Targets" title="Goals" sub="Your events and targets — what the plan builds toward." />
+      <div className="card">
+        <div className="empty">
+          <div className="ei"><Target /></div>
+          <h4>Goal editor is coming together</h4>
+          <p>Set an A-race or target and Trainly will periodize your plan toward it.</p>
+          <span className="tag">Coming soon</span>
+        </div>
       </div>
-    </div>
+    </AppShell>
   )
 }
-

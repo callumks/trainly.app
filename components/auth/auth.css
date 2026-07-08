@@ -1,0 +1,75 @@
+/* Trainly auth — light/editorial, scoped under .tr-auth (matches the dashboard brand) */
+
+.tr-auth{
+  --paper:#F5F6F7; --surface:#FFFFFF; --surface-2:#FAFBFC;
+  --ink:#0E1013; --ink-2:#343941; --muted:#7A8087; --faint:#AEB3B9;
+  --line:rgba(14,16,19,.10); --line-2:rgba(14,16,19,.055);
+  --accent:#E03E1F; --good:#2E9E77;
+  --mono:var(--font-mono),'IBM Plex Mono',ui-monospace,monospace;
+  --disp:var(--font-grotesk),'Space Grotesk',system-ui,sans-serif;
+  --ui:var(--font-inter),'Inter',system-ui,-apple-system,sans-serif;
+
+  min-height:100vh;background:var(--paper);color:var(--ink);
+  font-family:var(--ui);font-size:14px;-webkit-font-smoothing:antialiased;
+  display:grid;grid-template-columns:1.05fr 1fr;
+}
+.tr-auth *{box-sizing:border-box}
+@media(max-width:880px){.tr-auth{grid-template-columns:1fr}}
+
+/* ---- brand panel ---- */
+.tr-auth .panel{
+  position:relative;padding:48px;display:flex;flex-direction:column;justify-content:space-between;
+  border-right:1px solid var(--line);background:
+    radial-gradient(120% 80% at 0% 0%, rgba(224,62,31,.05), transparent 60%),
+    var(--surface-2);
+}
+@media(max-width:880px){.tr-auth .panel{border-right:none;border-bottom:1px solid var(--line);padding:32px 28px}}
+.tr-auth .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:-.03em;color:var(--ink);text-decoration:none}
+.tr-auth .brand .dot{width:11px;height:11px;border-radius:3px;background:var(--accent);transform:rotate(45deg)}
+.tr-auth .panel .lead{max-width:420px;margin:40px 0}
+@media(max-width:880px){.tr-auth .panel .lead{margin:24px 0 8px}}
+.tr-auth .panel .eyebrow{font-family:var(--mono);font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:18px}
+.tr-auth .panel h2{font-family:var(--disp);font-weight:600;font-size:38px;line-height:1.06;letter-spacing:-.03em;color:var(--ink)}
+@media(max-width:880px){.tr-auth .panel h2{font-size:28px}}
+.tr-auth .panel p.tag{color:var(--ink-2);font-size:15px;line-height:1.55;margin-top:16px;max-width:380px}
+.tr-auth .feats{display:flex;flex-direction:column;gap:11px}
+.tr-auth .feats .f{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tr-auth .feats .f .ar{color:var(--accent);font-weight:600}
+@media(max-width:880px){.tr-auth .feats{display:none}}
+
+/* ---- form side ---- */
+.tr-auth .formside{display:flex;align-items:center;justify-content:center;padding:48px}
+@media(max-width:880px){.tr-auth .formside{padding:32px 28px 48px}}
+.tr-auth .formwrap{width:100%;max-width:360px}
+.tr-auth .formwrap h1{font-family:var(--disp);font-weight:600;font-size:25px;letter-spacing:-.02em;color:var(--ink)}
+.tr-auth .formwrap .hint{color:var(--muted);font-size:13.5px;margin-top:6px;margin-bottom:26px}
+
+.tr-auth form{display:flex;flex-direction:column}
+.tr-auth .field{margin-bottom:15px}
+.tr-auth .field label{display:block;font-family:var(--mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);margin-bottom:7px}
+.tr-auth .field input{
+  width:100%;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:11px;
+  background:var(--surface);color:var(--ink);font-family:var(--ui);font-size:14.5px;
+  transition:border-color .15s, box-shadow .15s;
+}
+.tr-auth .field input::placeholder{color:var(--faint)}
+.tr-auth .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(224,62,31,.12)}
+.tr-auth .err{color:var(--accent);font-size:12px;font-family:var(--mono);margin-top:7px}
+
+.tr-auth button.submit{
+  height:46px;margin-top:8px;border:none;border-radius:11px;cursor:pointer;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--disp);font-weight:600;font-size:14.5px;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s ease, background .15s ease;
+}
+.tr-auth button.submit:hover{background:#000}
+.tr-auth button.submit:active{transform:translateY(1px)}
+.tr-auth button.submit:disabled{opacity:.6;cursor:default}
+.tr-auth button.submit .spin{width:15px;height:15px;border:2px solid rgba(245,246,247,.4);border-top-color:var(--paper);border-radius:50%;animation:tr-spin .7s linear infinite}
+@keyframes tr-spin{to{transform:rotate(360deg)}}
+
+.tr-auth .switch{margin-top:22px;font-size:13px;color:var(--muted);text-align:center}
+.tr-auth .switch a{color:var(--ink);font-weight:600;text-decoration:none;border-bottom:1.5px solid var(--accent);padding-bottom:1px}
+.tr-auth .switch a:hover{color:var(--accent)}
+.tr-auth .legal{margin-top:28px;font-family:var(--mono);font-size:10.5px;color:var(--faint);text-align:center;line-height:1.5}

@@ -2,7 +2,6 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
-import TopNav from '@/components/nav/TopNav'
 
 export default async function DashboardLayout({
   children,
@@ -21,10 +20,6 @@ export default async function DashboardLayout({
     redirect('/auth/login')
   }
 
-  return (
-    <div className="min-h-dvh">
-      <TopNav />
-      <div className="min-h-dvh">{children}</div>
-    </div>
-  )
-} 
+  // The redesigned dashboard provides its own (light) top bar.
+  return <>{children}</>
+}

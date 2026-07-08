@@ -12,16 +12,19 @@ export async function GET(request: NextRequest) {
     const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
     const { userId } = jwt.verify(token, secret) as { userId: string }
 
+    // Window: Monday of the current week (so the week grid is complete) through +13 days
     const today = new Date()
-    const nextWeek = new Date()
-    nextWeek.setDate(today.getDate() + 7)
+    const monday = new Date(today)
+    monday.setDate(today.getDate() - ((today.getDay() + 6) % 7))
+    const horizon = new Date(today)
+    horizon.setDate(today.getDate() + 13)
 
     const res = await db.query(
       `SELECT id, date, name, session_type, intensity, status, duration_minutes
        FROM training_sessions
        WHERE user_id = $1 AND date >= $2 AND date <= $3
        ORDER BY date ASC`,
-      [userId, today.toISOString().slice(0,10), nextWeek.toISOString().slice(0,10)]
+      [userId, monday.toISOString().slice(0,10), horizon.toISOString().slice(0,10)]
     )
     return NextResponse.json({ sessions: res.rows })
   } catch (e: any) {

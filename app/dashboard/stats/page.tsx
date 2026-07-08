@@ -1,11 +1,13 @@
 import React from 'react'
+import AppShell from '@/components/app/AppShell'
+import PageHeader from '@/components/app/PageHeader'
+import ProgressView from '@/components/dashboard/ProgressView'
 
 export default function StatsPage() {
   return (
-    <div className="p-8 space-y-6">
-      <h2 className="text-2xl font-bold">Stats</h2>
-      <p className="text-muted-foreground">Not enough data yet. Sync activities or add a plan.</p>
-    </div>
+    <AppShell>
+      <PageHeader eyebrow="Trends" title="Progress" sub="Fitness, fatigue, and form over time — across every discipline." />
+      <ProgressView />
+    </AppShell>
   )
 }
-

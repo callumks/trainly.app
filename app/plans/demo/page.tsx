@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import AppShell from "@/components/app/AppShell";
+import PageHeader from "@/components/app/PageHeader";
 
 type Plan = {
   athlete: { sport: string; level: string; goal: string };
@@ -36,55 +38,48 @@ export default function DemoPlanPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Generate Week Plan (Demo)</h1>
-      <textarea
-        className="w-full border rounded p-3"
-        rows={4}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-      />
-      <button
-        onClick={generate}
-        disabled={loading}
-        className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-      >
-        {loading ? "Generating…" : "Generate"}
-      </button>
+    <AppShell>
+      <PageHeader eyebrow="Demo" title="Generate a week" sub="A quick demo of the plan engine — describe the athlete and goal." />
+      <div className="card" style={{ maxWidth: 800 }}>
+        <textarea
+          style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 13, background: "var(--surface-2)", color: "var(--ink)", fontFamily: "var(--ui)", fontSize: 14, resize: "vertical" }}
+          rows={4}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <div style={{ marginTop: 14 }}>
+          <button className="btn accent" onClick={generate} disabled={loading}>
+            {loading ? "Generating…" : "Generate"}
+          </button>
+        </div>
 
-      {error && <p className="text-red-600">{error}</p>}
+        {error && <p style={{ color: "var(--accent)", fontFamily: "var(--mono)", fontSize: 12.5, marginTop: 14 }}>{error}</p>}
 
-      {plan && (
-        <div className="space-y-4">
-          <div className="p-4 border rounded">
-            <div className="text-sm text-gray-500">
-              {plan.athlete.sport} • {plan.athlete.level}
+        {plan && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 20 }}>
+            <div style={{ border: "1px solid var(--line)", borderRadius: 12, padding: 16, background: "var(--surface-2)" }}>
+              <div className="eyebrow">{plan.athlete.sport} · {plan.athlete.level}</div>
+              <div style={{ fontFamily: "var(--disp)", fontWeight: 600, fontSize: 16, marginTop: 6 }}>{plan.athlete.goal}</div>
+              <p style={{ marginTop: 8, fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.55 }}>{plan.plan_summary}</p>
             </div>
-            <div className="font-medium">{plan.athlete.goal}</div>
-            <p className="mt-2">{plan.plan_summary}</p>
-          </div>
 
-          {plan.weeks.map((w) => (
-            <div key={w.week_number} className="space-y-2">
-              <h2 className="text-xl font-semibold">Week {w.week_number}</h2>
-              <div className="grid gap-3">
+            {plan.weeks.map((w) => (
+              <div key={w.week_number} style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                <div className="eyebrow">Week {w.week_number}</div>
                 {w.sessions.map((s, i) => (
-                  <div key={i} className="p-3 border rounded">
-                    <div className="flex justify-between">
-                      <div className="font-medium">{s.title}</div>
-                      <div className="text-sm opacity-70">
-                        {s.intensity} • {s.duration_minutes}m
-                      </div>
+                  <div key={i} style={{ border: "1px solid var(--line)", borderRadius: 11, padding: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                      <div style={{ fontFamily: "var(--disp)", fontWeight: 600, fontSize: 13.5 }}>{s.title}</div>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--muted)", whiteSpace: "nowrap" }}>{s.intensity} · {s.duration_minutes}m</div>
                     </div>
-                    <div className="text-sm mt-1">{s.notes}</div>
+                    {s.notes && <div style={{ fontSize: 12.5, color: "var(--ink-2)", marginTop: 5 }}>{s.notes}</div>}
                   </div>
                 ))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </AppShell>
   );
 }
-

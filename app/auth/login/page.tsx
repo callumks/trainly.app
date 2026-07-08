@@ -2,53 +2,44 @@ import React from 'react'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { redirect } from 'next/navigation'
-import { AuthForm } from '@/components/auth/auth-form'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Activity } from 'lucide-react'
 import Link from 'next/link'
+import { AuthForm } from '@/components/auth/auth-form'
 
 export default function LoginPage() {
   const token = cookies().get('auth-token')?.value
+  let valid = false
   if (token) {
     try {
-      const secret = process.env.JWT_SECRET || 'your-secret-key-change-this'
-      jwt.verify(token, secret)
-      redirect('/dashboard')
+      jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-this')
+      valid = true
     } catch {}
   }
+  if (valid) redirect('/dashboard')
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="flex items-center justify-center space-x-2 mb-4">
-            <Activity className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">trainly</span>
-          </Link>
-          <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-muted-foreground mt-2">
-            Sign in to continue your training journey
-          </p>
+    <div className="tr-auth">
+      <div className="panel">
+        <Link href="/" className="brand"><span className="dot" />Trainly</Link>
+        <div className="lead">
+          <div className="eyebrow">Hybrid training, adapted daily</div>
+          <h2>Your whole training.<br />One adaptive plan.</h2>
+          <p className="tag">Cycling, climbing, and strength — balanced around how you&apos;re actually recovering, not a rigid schedule.</p>
         </div>
+        <div className="feats">
+          <div className="f"><span className="ar">→</span> Plans that adapt to today&apos;s load</div>
+          <div className="f"><span className="ar">→</span> Cycling, climbing &amp; strength as one</div>
+          <div className="f"><span className="ar">→</span> Your data, your coach</div>
+        </div>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
-              Choose your preferred sign-in method below
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AuthForm />
-          </CardContent>
-        </Card>
-
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Don't have an account?{' '}
-          <Link href="/auth/register" className="text-primary hover:underline">
-            Sign up
-          </Link>
-        </p>
+      <div className="formside">
+        <div className="formwrap">
+          <h1>Welcome back</h1>
+          <p className="hint">Sign in to pick up your training where you left off.</p>
+          <AuthForm />
+          <p className="switch">New here? <Link href="/auth/register">Create an account</Link></p>
+        </div>
       </div>
     </div>
   )
-} 
+}
