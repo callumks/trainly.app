@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import OpenAI from 'openai'
 import { buildCoachContext, contextSummary, ruleReply } from '@/lib/coach'
 import { looksLikePlan, extractPlanSessions } from '@/lib/plan-engine'
+import { getCoachNotes, notesBlock, extractAndStoreNotes } from '@/lib/coach-memory'
 import { db } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest) {
     if (!message || typeof message !== 'string') return NextResponse.json({ error: 'message required' }, { status: 400 })
 
     const ctx = await buildCoachContext(userId)
+    const notes = await getCoachNotes(userId)
 
     const system = [
       "You are Trainly, texting with the athlete you coach — endurance + hybrid (cycling / climbing / strength).",
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
       '',
       "ATHLETE'S DATA:",
       contextSummary(ctx),
+      notesBlock(notes),
     ].join('\n')
 
     const reply = (await llmReply(system, Array.isArray(history) ? history : [], message)) ?? ruleReply(message, ctx)
@@ -103,6 +106,9 @@ export async function POST(req: NextRequest) {
     if (source === 'ai' && looksLikePlan(reply)) {
       proposedPlan = await extractPlanSessions(reply, new Date().toISOString().slice(0, 10))
     }
+
+    // Learn durable facts in the background — never blocks the reply
+    void extractAndStoreNotes(userId, message, reply)
 
     // Persist both sides of the exchange
     await db.query(`INSERT INTO coach_messages (user_id, role, text) VALUES ($1,'user',$2)`, [userId, message])

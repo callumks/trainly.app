@@ -185,3 +185,14 @@ CREATE TABLE public.coach_messages (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 CREATE INDEX coach_messages_user_time_idx ON public.coach_messages(user_id, created_at);
+
+-- Coach long-term memory (durable athlete facts extracted from chat)
+CREATE TABLE public.coach_memory (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  note TEXT NOT NULL,
+  category TEXT,
+  active BOOLEAN DEFAULT true NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+CREATE INDEX coach_memory_user_idx ON public.coach_memory(user_id, active, created_at);
