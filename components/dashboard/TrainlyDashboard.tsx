@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Zap, Target, Activity, Flag, Sparkles, Bike, Dumbbell, Waves, Mountain, Footprints } from 'lucide-react'
 import ThemeToggle from '@/components/app/ThemeToggle'
+import WeekGlance from './WeekGlance'
 import './dashboard.css'
 
 /* ---------------- chart helpers ---------------- */
@@ -103,19 +104,9 @@ export default function TrainlyDashboard({ name, initials }: { name: string; ini
   const live = !!overview && Number(overview.weeklyHours) > 0
   const firstName = (name || 'there').split(' ')[0]
 
-  // ---- header date / week (computed client-side so it always reads current) ----
+  // ---- header date (computed client-side so it always reads current) ----
   const today = new Date()
   const fmt = today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
-  const monday = new Date(today); monday.setDate(today.getDate() - ((today.getDay() + 6) % 7))
-  const week = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday); d.setDate(monday.getDate() + i)
-    return {
-      dn: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][i],
-      dd: d.getDate(),
-      isToday: d.toDateString() === today.toDateString(),
-      has: [0, 1, 3, 4, 5].includes(i), // sample: sessions Mon/Tue/Thu/Fri/Sat
-    }
-  })
 
   // ---- real-or-sample values ----
   const readyScore = live && readiness ? readiness.score : 84
@@ -243,6 +234,9 @@ export default function TrainlyDashboard({ name, initials }: { name: string; ini
 
           {/* CENTER */}
           <div className="col">
+            {/* this week — plan at a glance */}
+            <WeekGlance />
+
             {/* recent activity (real) */}
             <div className="card" style={{ animationDelay: '.05s' }}>
               <div className="chead">
